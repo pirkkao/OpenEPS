@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# Get process id 
+nid=$(echo $@ | sed -e "s/\/job/ /g" -e 's/\/output/ /g' | cut -d " " -f 2 | tr -d ' ')
+sleep 1
+echo $@
+
+parents=$(echo "$@" | sed -e 's/ /-/g' -e 's/\n/-/g')
+#cdate=$(cat $1)
+#cdate=${cdate:(-8)}
+#ndate=$(date +%Y%m%d -d "$cdate + 1 day")
+echo "$(hostname): parents-${parents}-date-${ndate}"
+
+inibasedir=
+exp_name=
+
+# Name nid=1 control run and other jobs pert$nid-1 
+# Also, give nid three digits (clearer for job organization) 
+#
+nid=$(echo "$nid - 1" | bc)
+if [ $nid -eq 0 ]; then
+ name=ctrl
+elif [ $nid -lt 10 ]; then
+ name=pert00$nid
+elif [ $nid -lt 100 ]; then
+ name=pert0$nid
+fi
+
+# Initial states
+#
+for item in CL GG SH; do
+ if [ $item == GG ]; then
+  cp -f ${inibasedir}/$cdate/${name}_ICM${item}_INIUA $cdate/inistates/${name}_ICM$item${exp_name}INIUA
+ fi
+ cp -f  ${inibasedir}/$cdate/${name}_ICM${item}_INIT $cdate/inistates/${name}_ICM$item${exp_name}INIT
+done
+
+# Parameter perturbations
+#
+if [ $nid -gt 0 ]; then
+ read par1 < $cdate/job${nid}/para
+ echo "Using par1 value $par1"
+ # WRITE NEW PARAMETER VALUES TO namelist HERE
+ # &NAMCUMF
+ #  ENTRORG=$par1
+ # /
+else
+ echo "Ctrl run"
+ # EITHER WRITE BLANK VALUES TO NAMELIST OR DO NOTHING
+ # &NAMCUMF
+ # /
+fi
+
+date | echo `exec cut -b12-20` pargen ${nid} >> $runs/../master.log
+
+

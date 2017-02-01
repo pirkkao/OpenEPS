@@ -1,0 +1,290 @@
+#!/usr/bin/perl
+
+use Time::Local;
+
+$usage = 'usage: mandtg [ DTG + [-]hhh | DTG1 - DTG2 | DTG1 -cmp_op DTG2 | -action DTG | +format DTG ]', "\n";
+
+if ( $#ARGV < 0 ) {
+# print help page
+
+   print $usage;
+   print <<EOD unless @ARGV;
+implemented are:
+\tmandtg
+\t\tprint help page DTG=yyyymmddhh
+\tmandtg DTG + incr
+\t\tadd incr (in hours) to  date-time, subtract in case incr < 0
+\tmandtg DTG1 - DTG2
+\tmandtg DTG1 -op DTG2 (op is lt, le, eq, ge, gt, ne)
+\tmandtg -wd.cc DTG where cc is the country code
+\tmandtg -weekday DTG
+\tmandtg -date DTG
+\tmandtg -year DTG
+\tmandtg -month DTG
+\tmandtg -day DTG
+\tmandtg -hour DTG
+\t\textract substrings
+\tmandtg +format DTG, with format as in 'date', but only supported conversions:
+\t\t%Y %m %d %H %M %S  to yyyy mm dd hh mm ss, resp.
+\t\t%%                 to %
+EOD
+
+   exit;
+
+} elsif ( $#ARGV == 0 ) {
+   die "mandtg: too few arguments\n$usage" if $#ARGV == 0;
+}
+
+if ( $ARGV[0] =~ s/^-// ) {
+
+# expect two arguments: mandtg -op DTG
+
+   $op  = $ARGV[0];
+   if ( $op eq 'day' or $op eq 'date' or $op eq 'year' or $op eq 'month' or $op eq 'hour' or $op eq 'easter'
+         or $op eq "weekday" or $op =~ m~^wd\.(..)$~ ) {
+      my $cc = $1;
+      $cc = "uk" if $op eq "weekday";
+      die "mandtg: operation '-$op' needs 2 arguments\n$usage" unless $#ARGV == 1;
+      $dtg = $ARGV[1];
+      my ( $y, $m, $d, $h ) = ( $dtg =~ /^(\d{1,4})(\d{2})(\d{2})(\d{2})$/ );
+      die "mandtg: operation '-$op' needs a date/time -date is wrong\n$usage"
+           unless isadate( sprintf( "%04d%02d%02d", $y, $m, $d ) );
+      die "mandtg: operation '-$op' needs a date/time -time is wrong\n$usage"
+           unless ( $h >= 0 && $h < 24 );
+      if ( $op eq 'hour' )      {
+         printf "%02d\n", $h;
+      } elsif ( $op eq 'year' ) {
+         printf "%04d\n", $y;
+      } elsif ( $op eq 'month' ) {
+         printf "%02d\n", $m;
+      } elsif ( $op eq 'day' ) {
+         printf "%02d\n", $d;
+      } elsif ( $op eq 'date' ) {
+         printf "%04d%02d%02d\n", $y, $m, $d;
+      } elsif ( $op eq 'easter' ) {
+         printf "%04d%04d\n", $y, iy2eastr( sprintf( "%04d%02d%02d", $y, $m, $d ) );
+      } elsif ( $cc ) {
+         print weekday( idat2wd( $dtg ), $cc), "\n";
+      }
+   } else {
+      die "mandtg: operation not implemented: -$op\n$usage";
+   }
+} elsif ( $ARGV[1] =~ /^[-+](..)?$/ ) {
+
+# expect 3 arguments: mandtg DTG + incr, mandtg + -incr, mandtg DTG1 - DTG2,
+#                     or mandtg DTG1 -cmp DTG2
+   $op  = $ARGV[1];
+   my $cp = $1;
+   die "mandtg: operation '$op' needs 3 arguments\n$usage" unless $#ARGV == 2;
+
+   if ( $op eq '+' ) {
+
+# add increment in hours to dtg in yyyymmddhh
+      my ($date, $hour) = ( $ARGV[0] =~ /^(\d{8})(\d{2})$/ );
+      my  $incr = $ARGV[2] if $ARGV[2] =~ /^[-+]?\d+$/;
+      die "mandtg: wrong date: yyyymmddhh + [-]hhh\n$usage" unless isadate( $date );
+      die "mandtg: wrong hour: yyyymmddhh + [-]hhh\n$usage" unless ( $hour >= 0 && $hour < 24 );
+      die "mandtg: wrong format: yyyymmddhh + [-]hhh\n$usage" unless defined( $incr ) && defined( $date ) && defined( $hour );
+      print adddtg( $ARGV[0], $ARGV[2] ), "\n";
+
+   } elsif ( $op eq '-'  || $cp eq 'lt' || $cp eq 'le' || $cp eq 'ne' ||
+             $cp eq 'eq' || $cp eq 'gt' || $cp eq 'ge' ) {
+
+      my ($date1, $hour1) = ( $ARGV[0] =~ /^(\d{8})(\d{2})$/ );
+      my ($date2, $hour2) = ( $ARGV[2] =~ /^(\d{8})(\d{2})$/ );
+      die "mandtg: wrong format: yyyymmddhh1 $op yyyymmddhh2\n$usage" unless defined( $date1 ) && defined( $hour1 );
+      die "mandtg: wrong format: yyyymmddhh1 $op yyyymmddhh2\n$usage" unless defined( $date2 ) && defined( $hour2 );
+      die "mandtg: wrong date1: yyyymmddhh1 $op yyyymmddhh2\n$usage" unless isadate( $date1 );
+      die "mandtg: wrong date2: yyyymmddhh1 $op yyyymmddhh2\n$usage" unless isadate( $date2 );
+      die "mandtg: wrong hour1: yyyymmddhh1 $op yyyymmddhh2\n$usage" unless ( $hour1 >= 0 && $hour1 < 24 );
+      die "mandtg: wrong hour2: yyyymmddhh1 $op yyyymmddhh2\n$usage" unless ( $hour2 >= 0 && $hour2 < 24 );
+
+# substract one date (yyyymmddhh) from another (yyyymmddhh) and give the result in hours
+
+      if ( $op eq '-'  ) {
+         print difdtg( $ARGV[0], $ARGV[2] ), "\n";
+      } else {
+
+# test operators: exit 0 if true, else exit 1
+         my $d = difdtg( $ARGV[0], $ARGV[2]);
+         exit 0 if $cp eq 'gt' && $d >  0;
+         exit 0 if $cp eq 'ge' && $d >= 0;
+         exit 0 if $cp eq 'eq' && $d == 0;
+         exit 0 if $cp eq 'le' && $d <= 0;
+         exit 0 if $cp eq 'lt' && $d <  0;
+         exit 0 if $cp eq 'ne' && $d != 0;
+         exit 1;
+      }
+   }
+
+} elsif ( $ARGV[0] =~ s~^\+~~ ) {
+
+# print a string as per a format
+
+   $op  = $ARGV[0];
+   die "mandtg: operation '-$op' needs 2 arguments\n$usage" unless $#ARGV == 1;
+   $dtg = $ARGV[1];
+   local ( $Y, $m, $d, $H, $M, $S ) = ( $dtg =~ /^(\d{1,4})(\d{2})(\d{2})(\d{2})$/, 0, 0 );
+   die "mandtg: operation '+$op' needs a date/time -date is wrong\n$usage"
+        unless isadate( sprintf( "%04d%02d%02d", $Y, $m, $d ) );
+   die "mandtg: operation '+$op' needs a date/time -time is wrong\n$usage"
+        unless ( $H >= 0 && $H < 24  && $M >= 0 && $M < 60 && $S >= 0 && $S <= 60 );
+   while ( $op =~ m~.~ ) {
+      while ( $op =~ s~^%(.)?~~ ) {
+         my $f = $1;
+         if ( $f =~ m~^[mdHMS]$~ ) {
+            print sprintf( "%02d", $$f );
+         } elsif ( $f eq 'Y' ) {
+            print sprintf( "%04d", $$f );
+         } elsif ( $f eq '%' ) {
+            print $f;
+         } else {
+            print "%$f";
+         }
+      }
+      if ( $op =~ s~(^[^%]+)~~ ) { print $1 }
+   }
+   print "\n";
+
+} else {
+
+# unknown operation
+   die "$usage" . "type 'mandtg' to list implemented actions\n";
+}
+#-------------------------------------------------------------------------------
+sub adddtg {
+# adddtg: add/subtract hours to/from date
+# synopsis: $newdate = adddtg( $olddate, $incr) where $incr may be pos or negative
+#           dates in yyyymmddhh and incr in hours
+# author: Ole Vignes, 8 November 2002
+    my($DTG,$hinc) = @_;
+    my($Y,$M,$D,$H) = ($DTG =~ /^(\d{4})(\d{2})(\d{2})(\d{2})$/);
+    my $dtgtime = timegm( 0, 0, $H, $D, $M-1, $Y );
+    ($H,$D,$M,$Y) = (gmtime($dtgtime + 3600*$hinc))[2..5];
+    return sprintf("%04d%02d%02d%02d", $Y+1900, $M+1, $D, $H);
+}
+#-------------------------------------------------------------------------------
+sub difdtg {
+# difdtg: substract date2 from date1 in hours
+# synopsis: $incr = difdtg( $date1, $date2 ) where $incr may be positive or negative
+#           dates in yyyymmddhh and incr in hours
+# author: csantos@inm.es, 20030310
+    my($DTG1,$DTG2) = @_;
+    my($Y1,$M1,$D1,$H1) = ($DTG1 =~ /^(\d{4})(\d{2})(\d{2})(\d{2})$/);
+    my($Y2,$M2,$D2,$H2) = ($DTG2 =~ /^(\d{4})(\d{2})(\d{2})(\d{2})$/);
+    my $dtgtime1 = timegm( 0, 0, $H1, $D1, $M1-1, $Y1 );
+    my $dtgtime2 = timegm( 0, 0, $H2, $D2, $M2-1, $Y2 );
+    my $diferencia = ( $dtgtime1 - $dtgtime2 ) / 3600;
+    return sprintf( "%d", $diferencia );
+}
+#-------------------------------------------------------------------------------
+sub isadate{
+# isadate: check it is a valid date yyyymmdd
+# synopsis: isadate($string) || die;
+# author: Gerard Cats, 8 January 2001
+   local($_)=shift;
+   my ($y, $m, $d ) = /^([0-9]{1,4})(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])$/;
+   return 0 unless $y;                          # 0 AD never existed
+   return 0 if ( $d == 31 && grep /$m/, ("02","04","06","09",11));
+   return 1 unless ( $m == 2);
+   return 0 if ( $d == 30);
+   return 1 unless ( $d == 29);
+   return 0 unless ( $y % 4 == 0);
+   return 1 unless ( $y % 100 == 0);
+   return 0 unless ( $y % 400 == 0);
+   return 1;
+}
+
+#-------------------------------------------------------------------------------
+sub weekday{
+# weekday: return name of day of week (0=Sunday)
+# synopsis: $day = weekday(nr, language);
+# author: Gerard Cats, 8 March 2004
+   my ($n, $lan ) = @_;
+   return "unknown"  if ( $n < 0 or $n > 6 );
+   if ( $lan eq "dk" ) {
+     return (
+     'soendag'      ,'mandag'       ,'tirsdag'     ,'onsdag'          ,
+     'torsdag'      ,'fredag'       ,'loerdag'     )[$n];
+   } elsif ( $lan eq "es" ) {
+     return (
+     'Domingo'      ,'Lunes'        ,'Martes'      ,'Miercoles'       ,
+     'Jueves'       ,'Viernes'      ,'Sabado'      )[$n];
+   } elsif ( $lan eq "fi" ) {
+     return (
+     'sunnuntai'    ,'maanantai'    ,'tiistai'     ,'keskiviikko'     ,
+     'torstai'      ,'perjantai'    ,'lauantai'    )[$n];
+   } elsif ( $lan eq "fr" ) {
+     return (
+     'dimanche'     ,'lundi'        ,'mardi'       ,'mercredi'        ,
+     'jeudi'        ,'vendredi'     ,'samedi'      )[$n];
+   } elsif ( $lan eq "ie" ) {
+     return (
+     'Domhnaigh'    ,'Luain'        ,'Mairt'       ,'Ceadaoin'        ,
+     'Deardaoin'    ,'Aoine'        ,'Sathairn'    )[$n];
+   } elsif ( $lan eq "is" ) {
+     return (
+     'sunnudagur'   ,'manudagur'    ,'thridjudagur','midvikudagur'    ,
+     'fimmtudagur'  ,'foestudagur'  ,'laugardagur' )[$n];
+   } elsif ( $lan eq "nl" ) {
+     return (
+     'zondag'       ,'maandag'      ,'dinsdag'     ,'woensdag'        ,
+     'donderdag'    ,'vrijdag'      ,'zaterdag'    )[$n];
+   } elsif ( $lan eq "no" ) {
+     return (
+     'soendag'      ,'mandag'       ,'tirsdag'     ,'onsdag'          ,
+     'torsdag'      ,'fredag'       ,'loerdag'     )[$n];
+   } elsif ( $lan eq "se" ) {
+     return (
+     'soendag'      ,'maandag'      ,'tisdag'      ,'onsdag'          ,
+     'torsdag'      ,'fredag'       ,'loerdag'     )[$n];
+   } elsif ( $lan eq "de" ) {
+     return (
+     'Sonntag'      ,'Montag'       ,'Dienstag'    ,'Mittwoch'        ,
+     'Donnerstag'   ,'Freitag'      ,'Samstag'     )[$n];
+   } elsif ( $lan eq "it" ) {
+     return (
+     'Domenica'     ,'Lunedi'       ,'Martedi'     ,'Mercoledi'       ,
+     'Giovedi'      ,'Venerdi'      ,'Sabato'      )[$n];
+   } elsif ( $lan eq "pt" ) {
+     return (
+     'Domingo'      ,'Segundo-feira','Terca-feira' ,'Quarta-feira'    ,
+     'Quinta-feira' ,'Sexta-feira'  ,'Sabado'     )[$n];
+   } else {		# uk is default
+     return (
+     'Sunday'       ,'Monday'       ,'Tuesday'     ,'Wednesday'       ,
+     'Thursday'     ,'Friday'       ,'Saturday'    )[$n];
+   }
+}
+#-------------------------------------------------------------------------------
+sub idat2wd{
+# idat2wd: return number of day of week (0=Sunday)
+# synopsis: $day = idat2wd(yyyymmdd)
+# Gerard Cats, 10 March 2005
+    my $DTG  = shift;
+    my($Y,$M,$D) = ($DTG =~ /^(\d{4})(\d{2})(\d{2})/);
+    my $dtgtime = timegm( 0, 0, $H, $D, $M-1, $Y );
+    return (gmtime($dtgtime))[6];
+}
+#-------------------------------------------------------------------------------
+sub iy2eastr{
+# iy2eastr: return date of Easter
+# synopsis: $day = iy2eastr(yyyy)
+# Gerard Cats, 10 March 2005
+    my $DTG  = shift;
+    my ($ky) = ($DTG =~ /^(\d{4})/);
+    my $ia=$ky%19;
+    my $ib=int( $ky/100 );
+    my $ic=$ky-$ib*100;
+    my $id=int( $ib/4 );
+    my $ie=$ib-$id*4;
+    my $if=int( ($ib+8)/25 );
+    my $ig=int( ($ib-$if+1)/3 );
+    my $ih=(19*$ia+$ib-$id-$ig+15)%30;
+    my $ii=int( $ic/4 );
+    my $ik=$ic-$ii*4;
+    my $il=(32+2*($ie+$ii)-$ih-$ik)%7;
+    my $im=int( ($ia+11*$ih+22*$il)/451 );
+    $in=int( ($ih+$il-7*$im+114)/31 );
+    return $in*100+($ih+$il-7*$im+114-$in*31)+1;
+}

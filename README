@@ -1,0 +1,131 @@
+# OpenEPS (Open Ensemble Prediction System)
+
+Ensemble Prediction System for OpenIFS build on top of Juha Lento's 
+MAKEMOTOR (see below).
+
+Workflow:
+./launch_job.sh / bash launch_job.sh
+ 1) initialize experiment (initjob.sh)
+    - Determine some crucial paths
+    - Modify scripts with path etc. information
+    - Adjust run parameters (nodes needed, wall clock time, 
+      model resolution, etc.)
+
+ 2) submit batchjob (job.bash)
+    - Loop over wanted dates and for each given date
+      i)   generate initial states for the model
+          (generate parameter perturbations)
+      ii)  run the model
+      iii) post process and evaluate the runs
+           (update parameter distributions)
+           (clean up)
+    - Makefile handles this workflow for each date
+
+ISSUES (December 30th):
+
+i) Start date initial state and parameter generations are now done 
+in initjob.sh. This could/should be done in job.bash. You could build
+this routine to the makefile and make it before entering the date loop.
+
+ii) This has not been tested with multiple jobs (i.e. only job1 as input). 
+The workflow should in *theory* be correct, but I predict problems with 
+determining which job we are in when running make (nid variable probably 
+gets multiple entries). The individual jobs need to be able to be identified 
+with some nid, otherwise it'll be hard to really parallelize the jobs.
+The nid thing is a bit chaotic at the moment in the code (the job folders are
+named nid, but identity to various tasks is given in 00${nid - 1}) be sure 
+to make it more uniform! I'd also name the job folders as "ctrl, pert001,
+pert002,... makes the readability more understandable!
+
+iii) There is no real initial state generation process now. Hopefully 
+Glenn's solution for the vertical and horizontal resolution changes are
+easy for you to implement. My idea was to do the resolution changes within
+the job to minimize the need for diskspace (remember to delete all 
+unnecessary files after a date!), this would also allow for a flexible
+system if the system is run with different resolutions.
+
+iv) Model parameter changes are handled via namelists. To modify a 
+parameter in a run, find out to which namelist it belongs and add an entry
+to fort.4 (or rather to namelist before copying):
+&NAMCUMF
+/
+
+==>
+
+&NAMCUMF
+ ENTRORG=2.0,
+/
+
+v) Initial states and parameter changes are now done in same script 
+(pargen). These could be separate processes depending how heavy the 
+initial state generation will be.
+
+vi) Cost function calculation needs an analysis field to which it can
+compare the forecast to. The model initial (control) states can be used
+as these, but I'd suggest extracting the necessary fields out and storing
+them somewhere prior to runs so the file reading won't take so long.
+
+vii) The post processing needs a lot of polishing (funceval), I've only made it 
+work to one case and have hardcoded all paths etc. sed these in from initjob
+to make it nicer, also you have to consider how the parallel application 
+works with nids.
+There are some !! NOTES in the fortran file, these need to be addressed
+in order to get e.g. areal weighting to work.
+Also, there is something sinister going on in the fields, doing a SUM over
+lat-lon points results in an "Illegal action". Sorry for not having time 
+to debug this but it is currently 22:17 and I need to go sleep and prepare
+for England!
+
+viii) I currently have no idea how to handle the model run itself because 
+make is already doing aprun, and the model should be submitted via 
+something similiar (now there is a second aprun in runmodel which 
+unsurprisingly does not work). The model itself runs if submitting an 
+individual job in the job folder.
+
+ix) Smaller bugs:
+
+
+Pirkka Ollinaho, pirkka.ollinaho@fmi.fi
+December 30, 2014
+
+
+
+% MAKEMOTOR
+% Juha Lento, juha.lento@csc.fi
+% December 6, 2014
+
+# MAKEMOTOR
+
+Run an iterative parameter search type algorithm with multiple concurrent
+function evaluations in a single job reservation.
+
+~~~~
+ 
+           funceval             pargen           funceval           pargen
+ input 1/1  ----->  output 1/1 \  -->  input 2/1  ----->  output 2/1 \  -->
+ input 2/1  ----->  output 2/1  \ -->  input 2/1  ----->  output 2/1  \ -->
+   ...      ----->    ...       / -->    ...      ----->    ...       / -->
+ input N/1  ----->  output N/1 /  -->  input 2/1  ----->  output 2/1 /  -->
+
+           |< --------  iteration 1  --------- >||< ------- iteration 2 --
+~~~~
+
+Parameter generation, `pargen`, requires all outputs from the previous
+iteration to generate new inputs for the next iteration function
+evaluation, `funceval`, thus effectively seriallizing the
+calculation. However, function evaluations, which themselves can be
+parallel programs, are run in parallel, using the resources allocated.
+
+
+# Demo
+
+Download <https://kannu.csc.fi/public.php?service=files&t=6fa69da4c1435bea565bfa12c24cd0ef>
+
+~~~~
+ 
+ > tar xvf makemotor.tar.gz
+ # Check/edit makemotor/job.bash, possibly other files, too.
+ # > bash makemotor/job.bash
+ # or
+ # > sbatch makemotor/job.bash
+~~~~

@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# Get process id
+nid=$(echo $@ | sed -e "s/\/job/ /g" -e 's/\/input/ /g' | cut -d " " -f 2 | tr -d ' ')
+echo $@
+sleep 5
+echo "$(hostname): $(pwd | grep -o 'job[0-9]\+')-output-$(pwd | grep -o '[0-9]\{8\}' )"
+
+date | echo `exec cut -b12-20` runmodel ${nid} >> $runs/../master.log
+
+oifs_exe=
+ifsdata=
+ifsdata2=
+grib_samples=
+exp_data=
+oifs_res=
+exp_name=
+
+cd $cdate/job${nid}
+
+# Name nid=1 control run and other jobs pert$nid-1 
+# Also, give nid three digits (clearer for job organization) 
+#
+nid=$(echo "$nid - 1" | bc)
+if [ $nid -eq 0 ]; then
+ name=ctrl
+elif [ $nid -lt 10 ]; then
+ name=pert00$nid
+elif [ $nid -lt 100 ]; then
+ name=pert0$nid
+fi
+
+rm -f ICM*+00*
+
+ln -sf ${exp_data}/${name}_ICMCL${exp_name}INIT  ICMCL${exp_name}INIT
+ln -sf ${exp_data}/${name}_ICMGG${exp_name}INIT  ICMGG${exp_name}INIT
+ln -sf ${exp_data}/${name}_ICMGG${exp_name}INIUA ICMGG${exp_name}INIUA
+ln -sf ${exp_data}/${name}_ICMSH${exp_name}INIT  ICMSH${exp_name}INIT
+
+ln -sf ${ifsdata}/climatology ./ifsdata
+ln -sf ${ifsdata}/rtables
+ln -sf ${ifsdata2}/38r1/climate/${oifs_res}l_2
+# REMOVE THIS WHEN DONE IN pargen
+cp -f $runs/../scripts/${exp_name}.namelist fort.4
+
+aprun -n 16 -d 6 -e GRIB_SAMPLES_PATH=$grib_samples -e OMP_NUM_THREADS=6 \
+    $oifs_exe -v ecmwf -e ${exp_name} -f t240
