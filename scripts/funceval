@@ -18,6 +18,8 @@ elif [ $nid -lt 10 ]; then
  name=pert00$nid
 elif [ $nid -lt 100 ]; then
  name=pert0$nid
+else
+    name=pert$nid
 fi
 
 # Change output to GRIB1

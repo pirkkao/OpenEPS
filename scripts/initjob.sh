@@ -3,6 +3,7 @@
 # Initialize paths etc.
 #
 #
+set -e
 echo
 echo "Initializing experiment $EXP..."
 
@@ -12,31 +13,58 @@ test -d $WORK | mkdir -p $WORK
 test -d $SCRI | mkdir -p $SCRI
 test -d $DATA | mkdir -p $DATA
 
-# Paths for initial state generation
+# Choose necessary paths based on which system we are in
 #
-inibasedir=/wrk/ollinaho/data/init
 
-# Paths for model
-#
-model=/homeappl/home/ollinaho/appl_sisu/oifs/intel/bin/master.exe
-ifsdata=/appl/climate/ifsdata
-ifsdata2=$WRKDIR/climate
-grib_samples=/appl/climate/gcc491/share/grib_api/ifs_samples/grib1_mlgrib2
-exp_data=$DATA/\$cdate/inistates
+#***********************************************************
+# TAITO/SISU
+if echo $HOSTNAME | grep taito > /dev/null; then
+ # Paths for initial state generation
+ #
+ inibasedir=/wrk/ollinaho/data/init
+
+ # Paths for model
+ #
+ model=/homeappl/home/ollinaho/appl_sisu/oifs/intel/bin/master.exe
+ ifsdata=/appl/climate/ifsdata
+ ifsdata2=$WRKDIR/climate
+ grib_samples=/appl/climate/gcc491/share/grib_api/ifs_samples/grib1_mlgrib2
+ exp_data=$DATA/\$cdate/inistates
+
+#***********************************************************
+# OLLIN HOME
+elif echo $HOSTNAME | grep ollin > /dev/null; then
+ # Paths for initial state generation
+ #   
+ inibasedir=$HOME/projects/OIFS/data/init
+
+ # Paths for model
+ #  
+ model=$HOME/projects/OIFS/oifs38r1v04/make/gnu-opt/oifs/bin/master.exe
+ ifsdata=$inibasedir/climate
+ ifsdata2=$WRKDIR/climate
+ grib_samples=/home/ollin/Install_software/grib-api/share/grib_api/ifs_samples/grib1_mlgrib2
+ exp_data=$DATA/\$cdate/inistates
+#***********************************************************
+fi
+
+# Define which work queue to submit to (in case the system has several of these)
+MODE=test # queue
 
 # Copy run scripts
 #
-for item in job.bash makefile pargen runmodel funceval mandtg; do
+for item in job.bash makefile pargen model_link model_run funceval mandtg; do
  cp -f scripts/$item $SCRI/.
 done
 cp -f scripts/postpro/calculate_cost_function_template_en.f90 $SCRI/calc_cost_en.f90
 
 # Calculate cpu reservation
 #
-cpuspernode=16  # cpus per node 
+cpuspernode=16  # cpus per node TAITO
+cpuspernode=1
 timeformodel=10  # model run time in mins
 # add routine for calculating number of dates
-dates=2
+dates=1
 # define parallelism
 nodespermodel=2
 ncpus=$(echo "$nodespermodel * $cpuspernode" | bc)
@@ -44,12 +72,12 @@ totaltime=$(echo "$timeformodel * $ENS * $dates" | bc)
 parallels=$(echo "$NNODES / $nodespermodel" | bc)
 reservation=$(echo "$totaltime / $parallels" | bc)
 
-echo "The batch job will reserve $NNODES nodes for $reservation minutes!"
-MODE=test # queue
+echo "OpenEPS will reserve $NNODES nodes for $reservation minutes!"
 
 # Modify genpar
 #
-sed -i -e "s/inibasedir=/inibasedir=${inibasedir//\//\/}/g" $SCRI/pargen
+#sed -i -e "s/inibasedir=/inibasedir=${inibasedir//\//\/}/g" $SCRI/pargen # worked in taito 2014
+sed -i -e "s/inibasedir\=/inibasedir\=${inibasedir////\\/}/g" $SCRI/pargen
 sed -i -e "s/exp_name=/exp_name=$EXPS/g"                    $SCRI/pargen
 
 # Modify job.bash
@@ -62,13 +90,13 @@ sed -i -e "s/per-node=16/per-node=$cpuspernode/g"       $SCRI/job.bash
 
 # Modify runmodel
 #
-sed -i -e "s/oifs_exe=/oifs_exe=${model//\//\/}/g"                $SCRI/runmodel
-sed -i -e "s/ifsdata=/ifsdata=${ifsdata//\//\/}/g"                $SCRI/runmodel
-sed -i -e "s/ifsdata2=/ifsdata2=${ifsdata2//\//\/}/g"             $SCRI/runmodel
-sed -i -e "s/grib_samples=/grib_samples=${grib_samples//\//\/}/g" $SCRI/runmodel
-sed -i -e "s/exp_data=/exp_data=${exp_data//\//\/}/g"             $SCRI/runmodel
-sed -i -e "s/oifs_res=/oifs_res=$RES/g"                           $SCRI/runmodel
-sed -i -e "s/exp_name=/exp_name=$EXPS/g"                          $SCRI/runmodel
+sed -i -e "s/oifs_exe=/oifs_exe=${model////\\/}/g"                $SCRI/model_link
+sed -i -e "s/ifsdata=/ifsdata=${ifsdata////\\/}/g"                $SCRI/model_link
+sed -i -e "s/ifsdata2=/ifsdata2=${ifsdata2////\\/}/g"             $SCRI/model_link
+sed -i -e "s/grib_samples=/grib_samples=${grib_samples////\\/}/g" $SCRI/model_link
+sed -i -e "s/exp_data=/exp_data=${exp_data////\\/}/g"             $SCRI/model_link
+sed -i -e "s/oifs_res=/oifs_res=$RES/g"                           $SCRI/model_link
+sed -i -e "s/exp_name=/exp_name=$EXPS/g"                          $SCRI/model_link
 
 # Determine lat/lon/lev, length of time step and output interval
 #
@@ -84,6 +112,12 @@ elif [ $RES -eq 255 ]; then
  lev=91
  tim=2700.0
  OUTP=24
+elif [ $RES -eq 21 ]; then
+    lon=
+    lat=
+    lev=19
+    tim=600.0
+    OUTP=10
 else
  echo "Resolution yet undefined!"
  exit
@@ -147,11 +181,11 @@ sed -i -e "s/NLON=512/NLON=$lon/g" $SCRI/$EXPS.namelist
 
 # Modify post process
 #
-cp -f scripts/postpro/testi.f90          $SCRI/.
+#cp -f scripts/postpro/testi.f90          $SCRI/.
 
-sed -i -e "s/lon=768/lon=$lon/g" $SCRI/testi.f90
-sed -i -e "s/lat=384/lat=$lat/g" $SCRI/testi.f90
-sed -i -e "s/lev=21/lev=$LEV/g"  $SCRI/testi.f90
+#sed -i -e "s/lon=768/lon=$lon/g" $SCRI/testi.f90
+#sed -i -e "s/lat=384/lat=$lat/g" $SCRI/testi.f90
+#sed -i -e "s/lev=21/lev=$LEV/g"  $SCRI/testi.f90
 
 
 # TEMP INIT
@@ -186,7 +220,7 @@ for i in $(seq 1 $ENSN); do
  elif [ $i -lt 10 ]; then
   name=pert00$name
  fi
- for item in CL GG SH; do
+ for item in GG SH; do # CL GG SH; do
   if [ $item == GG ]; then
    cp -f ${inibasedir}/$SDATE/${name}_ICM${item}_INIUA $SCRI/$SDATE/inistates/${name}_ICM$item${EXPS}INIUA
   fi

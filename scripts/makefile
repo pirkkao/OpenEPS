@@ -13,12 +13,15 @@ all : $(NEW_INPUTS)
 # All OUTPUTS need to be ready before any of the NEW_INPUTS are made
 $(NEW_INPUTS) : $(OUTPUTS)
 	mkdir -p $(dir $@)
-	$(GENERATE) $^ > $@
+	$(GENPARS) $^ > $@
 
 # Only INFILE corresponding to the specific OUTFILE need to exist before
 # making OUTFILE 
 %/$(OUTFILE) : %/$(INFILE)
-	$(RUNEPS) $^ > $@
+	cd $(dir $@) ; $(GENLINK); $(RUNEPS)
+
+#%/$(LINKFILE): %/$(INFILE)
+#	$(GENLINK) $^ > $@
 
 #
 %/$(POSTPRO) : %/$(OUTFILE)

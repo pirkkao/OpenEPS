@@ -24,11 +24,13 @@ elif [ $nid -lt 10 ]; then
  name=pert00$nid
 elif [ $nid -lt 100 ]; then
  name=pert0$nid
+else
+    name=pert$nid
 fi
 
 # Initial states
 #
-for item in CL GG SH; do
+for item in GG SH; do # CL GG SH; do
  if [ $item == GG ]; then
   cp -f ${inibasedir}/$cdate/${name}_ICM${item}_INIUA $cdate/inistates/${name}_ICM$item${exp_name}INIUA
  fi

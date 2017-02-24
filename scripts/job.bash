@@ -27,12 +27,6 @@ startdate=${3}
 enddate=${4} #$(day "$startdate + 1 days")
 dstep=${5}
 
-# Set programs
-pargen=${scripts}/pargen
-runmodel=${scripts}/runmodel
-funceval=${scripts}/funceval
-makefile=${scripts}/makefile
-
 # Prepare input for the first batch of jobs
 mkdir -p $runs
 cd $runs
@@ -48,11 +42,16 @@ tasks=$(( $SLURM_JOB_NUM_NODES * $SLURM_NTASKS_PER_NODE ))
 jobtasks=$(( $tasks / $njobs ))
 
 # (MPI) launcher
-launcher=$(basename $(which aprun 2> /dev/null || which srun 2> /dev/null || which bash ))
+launcher=$(basename $(which aprun 2> /dev/null || which srun 2> /dev/null || which mpirun 2> /dev/null || which bash ))
 case "$launcher" in
     aprun|srun)
-	    launcher="$launcher -n $jobtasks bash"
+	launcher="$launcher -n $jobtasks bash"
+	launcher2=$launcher
 	    ;;
+    mpirun)
+	launcher="$launcher -np 2"
+	launcher2="bash"
+	;;
 esac
 
 # Variables for make
@@ -65,17 +64,37 @@ esac
 # OUTPUTS    - list of OUTFILEs 
 # NEW_INPUTS - INFILEs for the next step, the goal of this make step
 
-export EVALUATE GENERATE RUNEPS INFILE OUTFILE OUTPUTS NEW_INPUTS runs cdate
+export EVALUATE GENPARS GENLINK RUNEPS
+export INFILE LINKFILE OUTFILE OUTPUTS NEW_INPUTS runs cdate
 
 echo "Number of concurrent jobs $njobs"
 echo "Entering $runs"
+echo $launcher
+
+# Set programs
+pargen=${scripts}/pargen
+model_link=${scripts}/model_link
+model_run="/home/ollin/projects/OIFS/oifs38r1v04/make/gnu-opt/oifs/bin/master.exe"
+funceval=${scripts}/funceval
+makefile=${scripts}/makefile
 
 INFILE=input
+LINKFILE=
 OUTFILE=output
 POSTPRO=postp
-GENERATE="$launcher ${pargen}"
-RUNEPS="$launcher $runmodel"
-EVALUATE="$launcher $funceval"
+GENPARS="$launcher2 ${pargen}"
+GENLINK="$launcher2 ${model_link}"
+RUNEPS="$launcher ${model_run} -e teps"
+EVALUATE="$launcher2 $funceval"
+
+# Export information for the model
+export OIFS_GRIB_API_DIR=/home/ollin/Install_software/grib-api
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$OIFS_GRIB_API_DIR/lib
+export GRIB_SAMPLES_PATH=$OIFS_GRIB_API_DIR/share/grib_api/ifs_samples/grib1_mlgrib2
+export OMP_NUM_THREADS=1
+export DR_HOOK=1
+
+ulimit -s unlimited
 
 cdate=$startdate
 while [ $cdate -le $enddate ]; do
@@ -89,7 +108,9 @@ while [ $cdate -le $enddate ]; do
     # temp solution
     mkdir -p $cdate/inistates
 
-    make -f $makefile -j $njobs
+    #make -f $makefile -j $njobs
+    make -f $makefile -j 1
+    
     cdate=$ndate
 done
     

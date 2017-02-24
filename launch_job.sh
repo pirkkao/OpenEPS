@@ -15,16 +15,17 @@ EDATE=2013110212  && export EDATE  # Exp end   date
 DSTEP=24        && export DSTEP  # Hours between ensembles
 
 # Resolution, vertical levels, model run length (in h)
-RES=255 && export RES
-LEV=91  && export LEV
+RES=21 && export RES
+LEV=19  && export LEV
 FCL=3   && export FCL
 
 # Ensemble size
 ENS=1 && export ENS
-NNODES=8 && export NNODES
+NNODES=2 && export NNODES
 
 # Initialize 
 #
+if [ -z $WRKDIR ]; then WRKDIR=$HOME/projects/OIFS/data; fi
 WORK=$WRKDIR/$EXPL && export WORK
 SCRI=$WORK/scripts && export SCRI
 DATA=$WORK/data    && export DATA
@@ -35,7 +36,8 @@ bash scripts/initjob.sh
 cd $WORK
 echo 
 echo "Submitting job..."
-sbatch scripts/job.bash $SCRI $DATA $SDATE $EDATE $DSTEP
+#sbatch scripts/job.bash $SCRI $DATA $SDATE $EDATE $DSTEP
+bash scripts/job.bash $SCRI $DATA $SDATE $EDATE $DSTEP &
 #echo "sbatch scripts/job.bash $SCRI $DATA $SDATE $EDATE"
 echo "...done! Launcher exiting..."
 echo
