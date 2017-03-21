@@ -1,0 +1,26 @@
+#!/bin/bash
+#
+# Test that all vital paths/executables exist before
+# entering job execution.
+#
+
+echo
+echo "1) Testing for vital paths/executables..."
+
+# Check that all vital paths exist
+for target in $VITAL_PATHS; do
+    test -d ${!target} || { echo "Non-existing $target=${!target}"; exit 1; }
+done
+
+# Check that all vital executables exist
+for target in $VITAL_EXECS; do
+    test -f ${!target} || { echo "Non-existing $target=${!target}"; exit 1; }
+done
+
+# Check that all vital variables are defined
+for target in $VITAL_VARS; do
+    test ! -z ${!target} || { echo "Non-existing $target=${!target}"; exit 1; }
+done
+
+echo " ...tests passed!"
+echo

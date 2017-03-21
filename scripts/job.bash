@@ -16,46 +16,33 @@
 # command of the line does not return zero.
 set -e
 
+echo
+echo
+echo "4) Now in job.bash"
+echo
+
 # Helper function for formatting dates (YYYYMMDD)
 function day {
     date +%Y%m%d -d "$1"
 } # THIS SHOULD EITHER BE IN HOUR FORMAT OR YOU SHOULD USE mandtg
 
-# Set program source and work directories
-source sources/*
-
-scripts=$SCRI
-runs=$DATA
-
-# Set run steps
-startdate=$SDATE
-enddate=$EDATE
-dstep=$DSTEP
-
+# Set program source, work directories and available resources
+for f in sources/*; do source $f; done
 
 # Prepare input for the first batch of jobs
-cd $runs
-test -d $startdate || cp -r ${scripts}/$startdate .
-
-# Number of (MPI) jobs in a batch
-njobs=$(ls -1 ${runs}/${startdate} | wc -l)
-
-# Number of tasks per job
-: ${SLURM_JOB_NUM_NODES:=2}
-: ${SLURM_NTASKS_PER_NODE:=16}
-tasks=$(( $SLURM_JOB_NUM_NODES * $SLURM_NTASKS_PER_NODE ))
-jobtasks=$(( $tasks / $njobs ))
+cd $DATA
+test -d $SDATE || cp -r ${SCRI}/$SDATE .
 
 # (MPI) launcher
 launcher=$(basename $(which aprun 2> /dev/null || which srun 2> /dev/null || which mpirun 2> /dev/null || which bash ))
 case "$launcher" in
     aprun|srun)
-	launcher="$launcher -n $jobtasks bash"
-	launcher2=$launcher
+	parallel="$launcher -n $PARALLELS_IN_NODE"
+	serial=$launcher
 	    ;;
     mpirun)
-	launcher="$launcher -np 2"
-	launcher2="bash"
+	parallel="$launcher -np $PARALLELS_IN_NODE"
+	serial="bash"
 	;;
 esac
 
@@ -70,49 +57,36 @@ esac
 # NEW_INPUTS - INFILEs for the next step, the goal of this make step
 
 export EVALUATE GENPARS GENLINK RUNEPS
-export INFILE LINKFILE OUTFILE OUTPUTS NEW_INPUTS runs cdate
+export INFILE LINKFILE OUTFILE OUTPUTS NEW_INPUTS DATA cdate
 
-echo "Number of concurrent jobs $njobs"
-echo "Entering $runs"
-echo $launcher
 
 # Set programs
-pargen=${scripts}/pargen
-model_link=${scripts}/model_link
-model_run="/home/ollin/projects/OIFS/oifs38r1v04/make/gnu-opt/oifs/bin/master.exe"
-funceval=${scripts}/funceval
-makefile=${scripts}/makefile
+pargen=${SCRI}/pargen
+model_link=${SCRI}/model_link
+model_run=$MODEL_EXE
+funceval=${SCRI}/funceval
+makefile=${SCRI}/makefile
 
 INFILE=input
 LINKFILE=
 OUTFILE=output
 POSTPRO=eval
-GENPARS="$launcher2 ${pargen}"
-GENLINK="$launcher2 ${model_link}"
-RUNEPS="$GENLINK ; $launcher ${model_run} -e teps"
-#RUNEPS="echo > output"
-EVALUATE="$launcher2 $funceval"
+GENPARS="$serial ${pargen}"
+GENPARS="echo"
+GENLINK="$serial ${model_link}"
+RUNEPS="$GENLINK ; $parallel ${model_run} -e teps"
+RUNEPS="echo > output"
+EVALUATE="$serial $funceval"
 
-# Export information for the model
-export OIFS_GRIB_API_DIR=/home/ollin/Install_software/grib-api
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$OIFS_GRIB_API_DIR/lib
-export GRIB_SAMPLES_PATH=$OIFS_GRIB_API_DIR/share/grib_api/ifs_samples/grib1_mlgrib2
-export OMP_NUM_THREADS=1
-export DR_HOOK=1
+cdate=$SDATE
+while [ $cdate -le $EDATE ]; do
+    # Log
+    echo                                >> $WORK/master.log
+    echo "Running ens for $cdate"       >> $WORK/master.log
+    date | echo `exec cut -b13-21` init >> $WORK/master.log
 
-# Increase stack memory (model may crash with SEGV otherwise)
-ulimit -s unlimited
-
-cdate=$startdate
-while [ $cdate -le $enddate ]; do
-# Log
-    echo                                >> $runs/../master.log
-    echo "Running ens for $cdate"       >> $runs/../master.log
-    date | echo `exec cut -b13-21` init >> $runs/../master.log
-
-    echo "Processing date $cdate"
-#    ndate=$(day "$cdate + 1 day")
-    ndate=`exec ../scripts/./mandtg $cdate + $dstep`
+    echo "   Processing date $cdate"
+    ndate=`exec $SCRI/./mandtg $cdate + $DSTEP`
     flist=$(ls $cdate/job*/input)
     flist=${flist//[$'\t\r\n']/ }
     #OUTPUTS=${flist//\/input/\/output}

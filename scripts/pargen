@@ -1,12 +1,8 @@
 #!/bin/bash
 
 # Get process id 
-echo $@ >> $runs/../master.log
-echo $^ >> $runs/../master.log
 nid=$(pwd | grep -o -P 'job.{0,5}' | sed -e 's/job//g')
-date | echo `exec cut -b13-21` pargen ${nid} >> $runs/../master.log
-
-#source $runs/../sources/*
+date | echo `exec cut -b13-21` pargen ${nid} >> $WORK/master.log
 
 # Name nid=1 control run and other jobs pert$nid-1 
 # Also, give nid three digits (clearer for job organization) 

@@ -18,7 +18,7 @@ else
     name=pert$nid
 fi
 
-date | echo `exec cut -b13-21` funceval ${nid} >> $runs/../master.log
+date | echo `exec cut -b13-21` funceval ${nid} >> $WORK/master.log
 
 echo > eval
 

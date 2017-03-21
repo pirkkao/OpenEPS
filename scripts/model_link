@@ -4,11 +4,7 @@
 nid=$(pwd | grep -o -P 'job.{0,5}' | sed -e 's/job//g')
 
 # Log
-date | echo `exec cut -b13-21` runmodel ${nid} >> $runs/../master.log
-
-#source $runs/../sources/*
-
-#cd $runs/$cdate/job${nid}
+date | echo `exec cut -b13-21` runmodel ${nid} >> $WORK/master.log
 
 # Name nid=1 control run and other jobs pert$nid-1 
 # Also, give nid three digits (clearer for job organization) 
