@@ -1,12 +1,8 @@
 #!/bin/bash
 
 # Get process id
-nid=$(echo $@ | sed -e "s/\/job/ /g" -e 's/\/output/ /g' | cut -d " " -f 2 | tr -d ' ')
+nid=$(pwd | grep -o -P 'job.{0,5}' | sed -e 's/job//g')
 sleep 1
-
-#date | echo `exec cut -b12-20` funceval ${nid} >> $runs/../master.log
-
-#cd $cdate/job$nid
 
 # Name nid=1 control run and other jobs pert$nid-1 
 # Also, give nid three digits (clearer for job organization) 
@@ -21,6 +17,10 @@ elif [ $nid -lt 100 ]; then
 else
     name=pert$nid
 fi
+
+date | echo `exec cut -b13-21` funceval ${nid} >> $runs/../master.log
+
+echo > eval
 
 # Change output to GRIB1
 #
@@ -82,7 +82,6 @@ for item in var130 var131 var132 var152; do
 done
 $cdo -selzaxis,hybrid temp_var152.grb temp152
 mv temp152 temp_var152.grb
-fi
 rm -f temp??r
 # TEMP
 # Do the same for analysis fields, take these from initial states
@@ -158,3 +157,5 @@ ctrl
 EOF
 
 ./a.out
+
+fi

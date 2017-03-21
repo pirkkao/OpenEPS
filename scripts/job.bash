@@ -7,7 +7,10 @@
 #SBATCH -o out
 #SBATCH -e err
 
-# A script to run iterative parameter search type algorithm.
+# A script to run an ensemble of models for N-dates.
+#
+# Optionally an iterative parameter search type algorithm can be enabled.
+#
 
 # Stop execution in case of error. More specifically, stop if the last
 # command of the line does not return zero.
@@ -19,16 +22,18 @@ function day {
 } # THIS SHOULD EITHER BE IN HOUR FORMAT OR YOU SHOULD USE mandtg
 
 # Set program source and work directories
-scripts=${1}
-runs=${2}
+source sources/*
+
+scripts=$SCRI
+runs=$DATA
 
 # Set run steps
-startdate=${3}
-enddate=${4} #$(day "$startdate + 1 days")
-dstep=${5}
+startdate=$SDATE
+enddate=$EDATE
+dstep=$DSTEP
+
 
 # Prepare input for the first batch of jobs
-mkdir -p $runs
 cd $runs
 test -d $startdate || cp -r ${scripts}/$startdate .
 
@@ -81,10 +86,11 @@ makefile=${scripts}/makefile
 INFILE=input
 LINKFILE=
 OUTFILE=output
-POSTPRO=postp
+POSTPRO=eval
 GENPARS="$launcher2 ${pargen}"
 GENLINK="$launcher2 ${model_link}"
-RUNEPS="$launcher ${model_run} -e teps"
+RUNEPS="$GENLINK ; $launcher ${model_run} -e teps"
+#RUNEPS="echo > output"
 EVALUATE="$launcher2 $funceval"
 
 # Export information for the model
@@ -94,22 +100,29 @@ export GRIB_SAMPLES_PATH=$OIFS_GRIB_API_DIR/share/grib_api/ifs_samples/grib1_mlg
 export OMP_NUM_THREADS=1
 export DR_HOOK=1
 
+# Increase stack memory (model may crash with SEGV otherwise)
 ulimit -s unlimited
 
 cdate=$startdate
 while [ $cdate -le $enddate ]; do
+# Log
+    echo                                >> $runs/../master.log
+    echo "Running ens for $cdate"       >> $runs/../master.log
+    date | echo `exec cut -b13-21` init >> $runs/../master.log
+
     echo "Processing date $cdate"
 #    ndate=$(day "$cdate + 1 day")
     ndate=`exec ../scripts/./mandtg $cdate + $dstep`
     flist=$(ls $cdate/job*/input)
     flist=${flist//[$'\t\r\n']/ }
+    #OUTPUTS=${flist//\/input/\/output}
     OUTPUTS=${flist//\/input/\/output}
     NEW_INPUTS=${flist//${cdate}\//${ndate}\/}
     # temp solution
     mkdir -p $cdate/inistates
 
     #make -f $makefile -j $njobs
-    make -f $makefile -j 1
+    make -f $makefile -j 2
     
     cdate=$ndate
 done

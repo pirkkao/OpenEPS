@@ -15,15 +15,16 @@ $(NEW_INPUTS) : $(OUTPUTS)
 	mkdir -p $(dir $@)
 	$(GENPARS) $^ > $@
 
+#
+%/$(POSTPRO) : %/$(OUTFILE)
+	cd $(dir $@); $(EVALUATE) $^
+
 # Only INFILE corresponding to the specific OUTFILE need to exist before
 # making OUTFILE 
 %/$(OUTFILE) : %/$(INFILE)
-	cd $(dir $@) ; $(GENLINK); $(RUNEPS)
+	cd $(dir $@) ; $(RUNEPS)
 
 #%/$(LINKFILE): %/$(INFILE)
 #	$(GENLINK) $^ > $@
 
-#
-%/$(POSTPRO) : %/$(OUTFILE)
-	$(EVALUATE) $^
 

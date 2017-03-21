@@ -1,18 +1,12 @@
 #!/bin/bash
 
 # Get process id 
-nid=$(echo $@ | sed -e "s/\/job/ /g" -e 's/\/output/ /g' | cut -d " " -f 2 | tr -d ' ')
-sleep 1
-echo $@
+echo $@ >> $runs/../master.log
+echo $^ >> $runs/../master.log
+nid=$(pwd | grep -o -P 'job.{0,5}' | sed -e 's/job//g')
+date | echo `exec cut -b13-21` pargen ${nid} >> $runs/../master.log
 
-parents=$(echo "$@" | sed -e 's/ /-/g' -e 's/\n/-/g')
-#cdate=$(cat $1)
-#cdate=${cdate:(-8)}
-#ndate=$(date +%Y%m%d -d "$cdate + 1 day")
-echo "$(hostname): parents-${parents}-date-${ndate}"
-
-inibasedir=
-exp_name=
+#source $runs/../sources/*
 
 # Name nid=1 control run and other jobs pert$nid-1 
 # Also, give nid three digits (clearer for job organization) 
@@ -28,14 +22,16 @@ else
     name=pert$nid
 fi
 
+if false; then
 # Initial states
 #
 for item in GG SH; do # CL GG SH; do
  if [ $item == GG ]; then
-  cp -f ${inibasedir}/$cdate/${name}_ICM${item}_INIUA $cdate/inistates/${name}_ICM$item${exp_name}INIUA
+  cp -f ${INIBASEDIR}/$cdate/${name}_ICM${item}_INIUA $cdate/inistates/${name}_ICM$item${EXPS}INIUA
  fi
- cp -f  ${inibasedir}/$cdate/${name}_ICM${item}_INIT $cdate/inistates/${name}_ICM$item${exp_name}INIT
+ cp -f  ${INIBASEDIR}/$cdate/${name}_ICM${item}_INIT $cdate/inistates/${name}_ICM$item${EXPS}INIT
 done
+fi
 
 # Parameter perturbations
 #
@@ -52,7 +48,5 @@ else
  # &NAMCUMF
  # /
 fi
-
-date | echo `exec cut -b12-20` pargen ${nid} >> $runs/../master.log
 
 
