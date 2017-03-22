@@ -1,0 +1,65 @@
+#!/bin/bash
+#
+# ENVIRONMENT SPECIFIC SETTINGS
+#
+
+#-----------------------------------------------
+# SYSTEM - OLLIN - PERSONAL LINUX LAPTOP
+#-----------------------------------------------
+# Number of cores per node
+SYS_CPUSPERNODE=4
+
+# Define which work queue to submit to (in case the system has several of these)
+export SQUEUE=test # queue
+
+# Path structure
+WRKDIR=$HOME/projects/OIFS/data
+WORK=$WRKDIR/$EXPL
+SCRI=$WORK/scripts
+DATA=$WORK/data
+SRC=$WORK/sources
+export WRKDIR WORK SCRI DATA SRC
+
+
+#-----------------------------------------------
+# MODEL SPECIFIC DIRS AND SETTINGS
+#-----------------------------------------------
+# Paths to model
+MODEL_EXE=$HOME/projects/OIFS/oifs38r1v04/make/gnu-opt/oifs/bin/master.exe
+OIFS_GRIB_API_DIR=/home/ollin/Install_software/grib-api
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$OIFS_GRIB_API_DIR/lib # IS LD_LIB NEEDED AT ALL?
+GRIB_SAMPLES_PATH=$OIFS_GRIB_API_DIR/share/grib_api/ifs_samples/grib1_mlgrib2
+
+# Paths for initial state generation
+INIBASEDIR=$HOME/projects/OIFS/data/init
+
+# Paths to initial states
+IFSDATA=$INIBASEDIR/climate
+IFSDATA2=$WRKDIR/climate
+EXP_DATA=$DATA/\$cdate/inistates
+
+export MODEL_EXE
+export INIBASEDIR IFSDATA IFSDATA2 GRIB_SAMPLES_PATH
+export EXP_DATA
+export LD_LIBRARY_PATH
+
+# Define OMP level and whether to use DR_HOOK or not
+OMP_NUM_THREADS=1
+DR_HOOK=1
+export OMP_NUM_THREADS DR_HOOK
+
+# Increase stack memory (model may crash with SEGV otherwise)
+ulimit -s unlimited
+
+
+# --------------------------------------------------------------
+# TESTING
+# --------------------------------------------------------------
+# Vital paths that must exist
+VITAL_PATHS="$VITAL_PATHS WRKDIR INIBASEDIR IFSDATA IFSDATA2 GRIB_SAMPLES_PATH"
+
+# Vital executables that must exist
+VITAL_EXECS="$VITAL_EXECS MODEL_EXE"
+
+# Vital variables that must exist	
+VITAL_VARS="$VITAL_VARS WORK SCRI DATA SRC OMP_NUM_THREADS DR_HOOK"

@@ -25,6 +25,51 @@ function day {
 # Set program source, work directories and available resources
 for f in sources/*; do source $f; done
 
+
+#--------------------------------------------------------------
+# TEMP INIT
+#--------------------------------------------------------------
+# Dummy routine for generating initial input and parameter
+# perturbations
+#
+mkdir -p $SCRI/$SDATE/inistates
+cd $SCRI/$SDATE
+cat <<EOF > params
+2.5
+2.6
+2.7
+2.4
+3.2
+1.2
+1.0
+5.1
+1.4
+EOF
+
+for i in $(seq $ENS); do
+ mkdir -p $SCRI/$SDATE/job$i
+ echo >   $SCRI/$SDATE/job$i/input
+ sed -n ${i}p params > job${i}/para
+
+ if false; then
+ # Initial states
+ #
+ i=$(echo "$i - 1" | bc)
+ if [ $i -eq 0 ]; then
+  name=ctrl
+ elif [ $i -lt 10 ]; then
+  name=pert00$name
+ fi
+ for item in GG SH; do # CL GG SH; do
+  if [ $item == GG ]; then
+   cp -f ${INIBASEDIR}/$SDATE/${name}_ICM${item}_INIUA $SCRI/$SDATE/inistates/${name}_ICM$item${EXPS}INIUA
+  fi
+  cp -f  ${INIBASEDIR}/$SDATE/${name}_ICM${item}_INIT $SCRI/$SDATE/inistates/${name}_ICM$item${EXPS}INIT
+ done
+ fi
+ 
+done
+
 # Prepare input for the first batch of jobs
 cd $DATA
 test -d $SDATE || cp -r ${SCRI}/$SDATE .
@@ -58,7 +103,7 @@ export INFILE LINKFILE OUTFILE OUTPUTS NEW_INPUTS DATA cdate
 
 # Set programs
 pargen=${SCRI}/pargen
-model_link=${SCRI}/model_link
+model_link=${SCRI}/link.bash
 model_run=$MODEL_EXE
 funceval=${SCRI}/funceval
 makefile=${SCRI}/makefile

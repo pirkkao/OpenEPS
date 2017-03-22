@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Launch EPS job.
+# Launch an EPS job. Period.
 #
 #
 # Authors: pirkka.ollinaho@fmi.fi
@@ -19,24 +19,25 @@ source sources/${MODEL}_env.$HOST # Environment specific settings
 
 # Broadcast general
 #
-printf "\nOpenEPS `git tag`\n"
-printf "\nRunning an ensemble of $ENS-members for $MODEL."
-printf "\nStart date for ensemble is $SDATE and end date $EDATE\n"
+printf '\n%s\n'   "OpenEPS `git tag`"
+printf '\n%s'     "Running an ensemble of $ENS-members for ${MODEL^^}."
+printf '\n%s\n\n' "Start date for ensemble is $SDATE and end date $EDATE"
 
 # Check that all vital paths/executables exist
 #
-source scripts/general_test
+source scripts/general_test.bash
 
 # Initialize
 #
-source scripts/${MODEL}_init.bash
+source scripts/general_init.bash
 
+exit
 # Launch bash/batch job
 #
 cd $WORK
 printf "\n3) Submitting job...\n"
 #sbatch scripts/job.bash 
-bash scripts/job.bash &
+bash scripts/main.bash &
 printf "   ...done! Launcher exiting...\n\n"
 
 exit 1

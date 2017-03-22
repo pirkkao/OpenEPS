@@ -1,0 +1,43 @@
+#!/bin/bash
+#
+# CRITICAL ENVIRONMENT SPECIFIC PATHS
+#
+
+#-----------------------------------------------
+# TAITO/SISU
+#-----------------------------------------------
+
+
+# Path structure
+#
+#export WRKDIR=$HOME/projects/OIFS/data DEFAULT
+export WORK=$WRKDIR/$EXPL
+export SCRI=$WORK/scripts
+export DATA=$WORK/data
+
+# Paths for initial state generation
+#
+export INIBASEDIR=/wrk/ollinaho/data/init
+
+# Paths for model
+#
+export model=/homeappl/home/ollinaho/appl_sisu/oifs/intel/bin/master.exe
+export ifsdata=/appl/climate/ifsdata
+export ifsdata2=$WRKDIR/climate
+export grib_samples=/appl/climate/gcc491/share/grib_api/ifs_samples/grib1_mlgrib2
+export exp_data=$DATA/\$cdate/inistates
+
+# Define which work queue to submit to (in case the system has several of these)
+#
+export MODE=test # queue
+
+
+# Calculate cpu reservation
+#
+cpuspernode=16  # cpus per node TAITO
+cpuspernode=1
+timeformodel=10  # model run time in mins
+# add routine for calculating number of dates
+dates=1
+# define parallelism
+nodespermodel=2

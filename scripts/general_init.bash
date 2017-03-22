@@ -5,13 +5,12 @@
 # or not to the jobqueue, modify namelists.
 #
 set -e
-printf "\n2) Initializing OpenIFS ensemble $EXPL...\n"
+printf "\n2) Initializing ${MODEL^^} ensemble $EXPL...\n"
 
 
 # --------------------------------------------------------------
 # INITIALIZE STRUCTURE
 # --------------------------------------------------------------
-
 # Make dirs
 for item in $REQUIRE_DIRS; do
     test -d ${!item} || mkdir ${!item}
@@ -20,7 +19,7 @@ done
 # Copy scripts
 #
 for item in $REQUIRE_ITEMS; do
- cp -f scripts/$item $SCRI/.
+ cp -f scripts/$MODEL/$item $SCRI/.
 done
 
 # Copy sources
@@ -33,7 +32,7 @@ done
 # --------------------------------------------------------------
 # RESOURCE ALLOCATION
 # --------------------------------------------------------------
-source scripts/general_resource_allocation
+source scripts/general_resource_alloc.bash
 
 printf "   *************************************************************\n"
 printf "   OpenEPS will reserve $totncpus cores on $NNODES node(s) for $reservation minutes!\n"
@@ -44,30 +43,30 @@ printf "   *************************************************************\n"
 #--------------------------------------------------------------
 # BATCH JOB SETTINGS
 #--------------------------------------------------------------
-
 # If sending the job as bulk, modify job.bash
 #
-sed -i -e "s/.*SBATCH -p test.*/#SBATCH -p $SQUEUE/g"     $SCRI/job.bash
-sed -i -e "s/.*SBATCH -J test.*/#SBATCH -J $EXPS/g"     $SCRI/job.bash
-sed -i -e "s/.*SBATCH -t 5.*/#SBATCH -t $reservation/g" $SCRI/job.bash
-sed -i -e "s/.*SBATCH -N 2.*/#SBATCH -N $NNODES/g"      $SCRI/job.bash
-sed -i -e "s/per-node=16/per-node=$cpuspernode/g"       $SCRI/job.bash
+sed -i -e "s/.*SBATCH -p test.*/#SBATCH -p $SQUEUE/g"   $SCRI/main.bash
+sed -i -e "s/.*SBATCH -J test.*/#SBATCH -J $EXPS/g"     $SCRI/main.bash
+sed -i -e "s/.*SBATCH -t 5.*/#SBATCH -t $reservation/g" $SCRI/main.bash
+sed -i -e "s/.*SBATCH -N 2.*/#SBATCH -N $NNODES/g"      $SCRI/main.bash
+sed -i -e "s/per-node=16/per-node=$cpuspernode/g"       $SCRI/main.bash
 
 
 #--------------------------------------------------------------
-# Modify run namelist
+# MODIFY RUN NAMELIST
 #--------------------------------------------------------------
-
 # Modify number of cores, timestepping, select output variables, etc.
 #
-source scripts/oifs_namelist_gen
+source scripts/$MODEL/namelist_general.bash
 
 # Write namelist part that will replace default values
 #
-source scripts/run/exp.namelistfc_t$RES.bash
+source scripts/$MODEL/namelist_t$RES.bash
+
 
 #--------------------------------------------------------------
-
+# MODIFY POST-PROCESSING
+#--------------------------------------------------------------
 # Modify and compile fortran files
 #
 #sed -i -e "s/\:\:lon=320/\:\:lon=$lon/g"      $SCRI/calc_cost_en.f90
@@ -84,48 +83,5 @@ source scripts/run/exp.namelistfc_t$RES.bash
 #sed -i -e "s/lon=768/lon=$lon/g" $SCRI/testi.f90
 #sed -i -e "s/lat=384/lat=$lat/g" $SCRI/testi.f90
 #sed -i -e "s/lev=21/lev=$LEV/g"  $SCRI/testi.f90
-
-
-# TEMP INIT
-# Dummy routine for generating initial input and parameter
-# perturbations
-#
-mkdir -p $SCRI/$SDATE/inistates
-cd $SCRI/$SDATE
-cat <<EOF > params
-2.5
-2.6
-2.7
-2.4
-3.2
-1.2
-1.0
-5.1
-1.4
-EOF
-
-for i in $(seq $ENS); do
- mkdir -p $SCRI/$SDATE/job$i
- echo >   $SCRI/$SDATE/job$i/input
- sed -n ${i}p params > job${i}/para
-
- if false; then
- # Initial states
- #
- i=$(echo "$i - 1" | bc)
- if [ $i -eq 0 ]; then
-  name=ctrl
- elif [ $i -lt 10 ]; then
-  name=pert00$name
- fi
- for item in GG SH; do # CL GG SH; do
-  if [ $item == GG ]; then
-   cp -f ${INIBASEDIR}/$SDATE/${name}_ICM${item}_INIUA $SCRI/$SDATE/inistates/${name}_ICM$item${EXPS}INIUA
-  fi
-  cp -f  ${INIBASEDIR}/$SDATE/${name}_ICM${item}_INIT $SCRI/$SDATE/inistates/${name}_ICM$item${EXPS}INIT
- done
- fi
- 
-done
 
 printf "   ...done!\n\n"
