@@ -1,0 +1,74 @@
+#!/bin/bash
+#
+# EXPERIMENT SPECIFIC SETTINGS
+#
+
+# --------------------------------------------------------------
+# GENERAL
+# --------------------------------------------------------------
+# Basics
+EXPL="testiEPS4"  # Long exp name
+EXPS="teps"       # 4 letter exp name
+SDATE=2013110212  # Exp start date
+EDATE=2013110212  # Exp end   date
+DSTEP=24          # Hours between ensembles
+export EXPL EXPS SDATE EDATE DSTEP
+
+# Resolution, vertical levels, model run length (in h)
+RES=21
+LEV=19
+FCL=3
+
+# Ensemble size
+ENS=4
+
+# Resources
+# (number of nodes, number of cores per model,
+# estimate of model execution time)
+NNODES=1
+CPUSPERMODEL=2
+TIMEFORMODEL=0.5
+export RES LEV FCL ENS NNODES
+
+
+# --------------------------------------------------------------
+# REQUIRED DIRS AND SCRIPTS
+# --------------------------------------------------------------
+# Model structure and programs that are needed
+REQUIRE_DIRS="WORK SCRI DATA SRC"
+REQUIRE_ITEMS="main.bash ../makefile pargen link.bash run.bash funceval ../mandtg"
+REQUIRE_NAMEL="namelist_general.bash namelist_t$RES.bash"
+
+
+# --------------------------------------------------------------
+# TESTING
+# --------------------------------------------------------------
+# Vital executables that must exist
+for item in $REQUIRE_ITEMS; do
+    VITAL_EXECS="$VITAL_EXECS scripts/$MODEL/$item"
+done
+for item in $REQUIRE_NAMEL; do
+    VITAL_EXECS="$VITAL_EXECS scripts/$MODEL/$item"
+done
+
+# Vital variables that must exist
+VITAL_VARS="$VITAL_VARS EXPL EXPS SDATE EDATE DSTEP RES LEV FCL ENS NNODES"
+
+ 
+# --------------------------------------------------------------
+# MODEL OUTPUT
+# --------------------------------------------------------------
+# Model level variables and model levels
+VARSM="130 138 155 133"   # String list with spaces in between
+LEVSM=$(echo $(seq 19)) # String list with spaces in between
+LEVSM="-99"
+
+# Pressure level variables and pressure levels (in Pa)
+VARSP="129"
+LEVSP="50000.0"
+
+# Surface level dynamic variables
+VARSS="129 152"
+
+# Surface variables
+VARPP="151 165 176 177 208"

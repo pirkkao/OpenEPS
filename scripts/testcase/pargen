@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Get process id
+# Not as straightforward since not in a dir
+# Need to rethink this...
+nid=$(pwd | grep -o -P 'job.{0,5}' | sed -e 's/job//g')
+date | echo `exec cut -b13-21` pargen ${nid} >> $WORK/master.log
+
+
+

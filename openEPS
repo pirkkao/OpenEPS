@@ -8,14 +8,14 @@
 
 # Run options
 #
-export NAME=name
+export NAME=test
 export MODEL=oifs
 export HOST=$(hostname | cut -c 1-5)
 
 # Import correct settings
 #
-source sources/${MODEL}_exp.$NAME # Experiment specific settings
-source sources/${MODEL}_env.$HOST # Environment specific settings
+source sources/${MODEL}/exp.$NAME # Experiment specific settings
+source sources/${MODEL}/env.$HOST # Environment specific settings
 
 # Broadcast general
 #
@@ -31,7 +31,7 @@ source scripts/general_test.bash
 #
 source scripts/general_init.bash
 
-exit
+
 # Launch bash/batch job
 #
 cd $WORK

@@ -24,7 +24,7 @@ done
 
 # Copy sources
 #
-for item in ${MODEL}_exp.$NAME ${MODEL}_env.$HOST; do
+for item in ${MODEL}/exp.$NAME ${MODEL}/env.$HOST; do
     cp -f sources/$item $SRC/.
 done
 
@@ -45,11 +45,11 @@ printf "   *************************************************************\n"
 #--------------------------------------------------------------
 # If sending the job as bulk, modify job.bash
 #
-sed -i -e "s/.*SBATCH -p test.*/#SBATCH -p $SQUEUE/g"   $SCRI/main.bash
-sed -i -e "s/.*SBATCH -J test.*/#SBATCH -J $EXPS/g"     $SCRI/main.bash
-sed -i -e "s/.*SBATCH -t 5.*/#SBATCH -t $reservation/g" $SCRI/main.bash
-sed -i -e "s/.*SBATCH -N 2.*/#SBATCH -N $NNODES/g"      $SCRI/main.bash
-sed -i -e "s/per-node=16/per-node=$cpuspernode/g"       $SCRI/main.bash
+#sed -i -e "s/.*SBATCH -p test.*/#SBATCH -p $SQUEUE/g"   $SCRI/main.bash
+#sed -i -e "s/.*SBATCH -J test.*/#SBATCH -J $EXPS/g"     $SCRI/main.bash
+#sed -i -e "s/.*SBATCH -t 5.*/#SBATCH -t $reservation/g" $SCRI/main.bash
+#sed -i -e "s/.*SBATCH -N 2.*/#SBATCH -N $NNODES/g"      $SCRI/main.bash
+#sed -i -e "s/per-node=16/per-node=$cpuspernode/g"       $SCRI/main.bash
 
 
 #--------------------------------------------------------------
@@ -57,11 +57,9 @@ sed -i -e "s/per-node=16/per-node=$cpuspernode/g"       $SCRI/main.bash
 #--------------------------------------------------------------
 # Modify number of cores, timestepping, select output variables, etc.
 #
-source scripts/$MODEL/namelist_general.bash
-
-# Write namelist part that will replace default values
-#
-source scripts/$MODEL/namelist_t$RES.bash
+for item in $REQUIRE_NAMEL; do
+    source scripts/$MODEL/$item
+done
 
 
 #--------------------------------------------------------------
