@@ -36,6 +36,5 @@ ln -sf ${IFSDATA}/climatology ./ifsdata
 ln -sf ${IFSDATA}/rtables
 ln -sf ${IFSDATA2}/38r1/climate/${RES}l_2
 
-# REMOVE THIS WHEN DONE IN pargen
-#cp -f $runs/../scripts/${EXPS}.namelist fort.4
-cp -f /home/ollin/projects/OIFS/oifs38r1v04/t21test2/fort.4 .
+cp -f $SCRI/${EXPS}.namelist fort.4
+#cp -f /home/ollin/projects/OIFS/oifs38r1v04/t21test2/fort.4 .

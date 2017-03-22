@@ -13,8 +13,13 @@ for target in $VITAL_PATHS; do
 done
 
 # Check that all vital executables exist
+# (the list can consist of both absolute paths ${target} or variables ${!target})
 for target in $VITAL_EXECS; do
-    test -f ${!target} || { echo "Non-existing $target=${!target}"; exit 1; }
+    if test -z ${!target} ; then
+	test -f ${target} || { echo "Non-existing $target=${!target}"; exit 1; }
+    else
+	test -f ${!target} || { echo "Non-existing $target=${!target}"; exit 1; }
+    fi
 done
 
 # Check that all vital variables are defined

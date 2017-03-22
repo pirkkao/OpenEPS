@@ -15,11 +15,7 @@
 # Stop execution in case of error. More specifically, stop if the last
 # command of the line does not return zero.
 set -e
-
-echo
-echo
-echo "4) Now in job.bash"
-echo
+printf "\n\n4) Now in job.bash\n"
 
 # Helper function for formatting dates (YYYYMMDD)
 function day {
@@ -37,11 +33,11 @@ test -d $SDATE || cp -r ${SCRI}/$SDATE .
 launcher=$(basename $(which aprun 2> /dev/null || which srun 2> /dev/null || which mpirun 2> /dev/null || which bash ))
 case "$launcher" in
     aprun|srun)
-	parallel="$launcher -n $PARALLELS_IN_NODE"
+	parallel="$launcher -n $CPUSPERMODEL"
 	serial=$launcher
 	    ;;
     mpirun)
-	parallel="$launcher -np $PARALLELS_IN_NODE"
+	parallel="$launcher -np $CPUSPERMODEL"
 	serial="bash"
 	;;
 esac
@@ -72,10 +68,10 @@ LINKFILE=
 OUTFILE=output
 POSTPRO=eval
 GENPARS="$serial ${pargen}"
-GENPARS="echo"
+#GENPARS="echo"
 GENLINK="$serial ${model_link}"
 RUNEPS="$GENLINK ; $parallel ${model_run} -e teps"
-RUNEPS="echo > output"
+#RUNEPS="echo > output"
 EVALUATE="$serial $funceval"
 
 cdate=$SDATE
@@ -96,9 +92,11 @@ while [ $cdate -le $EDATE ]; do
     mkdir -p $cdate/inistates
 
     #make -f $makefile -j $njobs
-    make -f $makefile -j 2
+    make -f $makefile -j $PARALLELS_IN_NODE
     
     cdate=$ndate
 done
     
 set +e
+
+printf "\n\nOpenEPS finished \n"

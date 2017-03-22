@@ -19,12 +19,9 @@ source sources/${MODEL}_env.$HOST # Environment specific settings
 
 # Broadcast general
 #
-echo
-echo "OpenEPS" `git tag`
-echo 
-echo "Running an ensemble of $ENS-members for $MODEL."
-echo "Start date for ensemble is $SDATE and end date $EDATE"
-echo 
+printf "\nOpenEPS `git tag`\n"
+printf "\nRunning an ensemble of $ENS-members for $MODEL."
+printf "\nStart date for ensemble is $SDATE and end date $EDATE\n"
 
 # Check that all vital paths/executables exist
 #
@@ -37,10 +34,9 @@ source scripts/${MODEL}_init.bash
 # Launch bash/batch job
 #
 cd $WORK
-echo 
-echo "3) Submitting job..."
+printf "\n3) Submitting job...\n"
 #sbatch scripts/job.bash 
 bash scripts/job.bash &
-echo " ...done! Launcher exiting..."
-echo
+printf "   ...done! Launcher exiting...\n\n"
+
 exit 1
