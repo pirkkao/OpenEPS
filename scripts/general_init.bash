@@ -13,7 +13,7 @@ printf "\n2) Initializing ${MODEL^^} ensemble $EXPL...\n"
 # --------------------------------------------------------------
 # Make dirs
 for item in $REQUIRE_DIRS; do
-    test -d ${!item} || mkdir ${!item}
+    test -d ${!item} || mkdir -p ${!item}
 done
 
 # Copy scripts
