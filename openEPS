@@ -9,7 +9,7 @@
 # Run options
 #
 export NAME=test
-export MODEL=oifs
+export MODEL=testcase
 export HOST=$(hostname | cut -c 1-5)
 
 # Import correct settings

@@ -1,31 +1,25 @@
 # Requires:
-# EVALUATE   - command to generate OUTPUTS from OLD_INPUTS
-# GENERATE   - command to generate NEW_INPUTS from OUTPUTS
-# INFILE     - name of the input file for EVALUATE command, must exist
-# OUTFILE    - name of the output file for EVALUATE command
-# OUTPUTS    - list of OUTFILEs 
-# NEW_INPUTS - INFILEs for the next step, the goal of this make step
+
+.SECONDARY: $(cdate)/%/outfile 
 
 .PHONY : all
 
-all : $(NEW_INPUTS)
+all : $(TARGET_A0)
 
-# All OUTPUTS need to be ready before any of the NEW_INPUTS are made
-$(NEW_INPUTS) : $(OUTPUTS)
-	mkdir -p $(dir $@)
-	$(GENPARS) $^ > $@
+$(TARGET_A0) : $(ALL_TARGETS_A)
+	$(RULE_A)
 
-#
-%/$(PPFILE) : %/$(OUTFILE)
-	cd $(dir $@); echo > pp
-#	cd $(dir $@); $(EVALUATE) $^
+$(TARGET_B0) : $(TARGET_B1)
+	$(RULE_B)
 
-# Only INFILE corresponding to the specific OUTFILE need to exist before
-# making OUTFILE 
-%/$(OUTFILE) : %/$(INFILE) #%/$(PARFILE)
-	cd $(dir $@) ; $(RUNEPS)
+$(TARGET_C0) : $(TARGET_C1)
+	$(RULE_C)
 
-#%/$(LINKFILE): %/$(INFILE)
-#	$(GENLINK) $^ > $@
+$(TARGET_D0) : $(TARGET_D1)
+	$(RULE_D)
+
+$(TARGET_E0) : $(TARGET_E1)
+	$(RULE_E)
+
 
 

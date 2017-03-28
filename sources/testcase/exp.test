@@ -10,7 +10,7 @@
 EXPL="testiEPS5"  # Long exp name
 EXPS="test"       # 4 letter exp name
 SDATE=2013110212  # Exp start date
-EDATE=2013110212  # Exp end   date
+EDATE=2013110312  # Exp end   date
 DSTEP=24          # Hours between ensembles
 export EXPL EXPS SDATE EDATE DSTEP
 
@@ -20,7 +20,7 @@ LEV=19
 FCL=3
 
 # Ensemble size
-ENS=1
+ENS=3
 
 # Resources
 # (number of nodes, number of cores per model,
