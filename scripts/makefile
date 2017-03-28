@@ -16,12 +16,13 @@ $(NEW_INPUTS) : $(OUTPUTS)
 	$(GENPARS) $^ > $@
 
 #
-%/$(POSTPRO) : %/$(OUTFILE)
-	cd $(dir $@); $(EVALUATE) $^
+%/$(PPFILE) : %/$(OUTFILE)
+	cd $(dir $@); echo > pp
+#	cd $(dir $@); $(EVALUATE) $^
 
 # Only INFILE corresponding to the specific OUTFILE need to exist before
 # making OUTFILE 
-%/$(OUTFILE) : %/$(INFILE)
+%/$(OUTFILE) : %/$(INFILE) #%/$(PARFILE)
 	cd $(dir $@) ; $(RUNEPS)
 
 #%/$(LINKFILE): %/$(INFILE)

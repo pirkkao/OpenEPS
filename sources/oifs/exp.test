@@ -19,8 +19,8 @@ RES=21
 LEV=19
 FCL=3
 
-# Ensemble size
-ENS=4
+# Ensemble size (CTRL+ENS)
+ENS=1
 
 # Resources
 # (number of nodes, number of cores per model,

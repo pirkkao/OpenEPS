@@ -42,10 +42,26 @@ totaltime=$(echo "$TIMEFORMODEL * $ENS * $dates" | bc)
 reservation=$(echo "$totaltime / $parallels" | bc)
 
 
+
+# (MPI) launcher
+launcher=$(basename $(which aprun 2> /dev/null || which srun 2> /dev/null || which mpirun 2> /dev/null || which bash ))
+case "$launcher" in
+    aprun|srun)
+	parallel="$launcher -n $CPUSPERMODEL"
+	serial=$launcher
+	    ;;
+    mpirun)
+	parallel="$launcher -np $CPUSPERMODEL"
+	serial="bash"
+	;;
+esac
+
+
 # Write a source file
 cat <<EOF > $SRC/resources
 #!/bin/bash
 export PARALLELS_IN_NODE=$parallels_in_node
 export PARALLEL_NODES=$parallel_nodes
-
+export parallel="$parallel"
+export serial="$serial"
 EOF

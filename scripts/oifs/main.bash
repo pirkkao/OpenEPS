@@ -74,18 +74,6 @@ done
 cd $DATA
 test -d $SDATE || cp -r ${SCRI}/$SDATE .
 
-# (MPI) launcher
-launcher=$(basename $(which aprun 2> /dev/null || which srun 2> /dev/null || which mpirun 2> /dev/null || which bash ))
-case "$launcher" in
-    aprun|srun)
-	parallel="$launcher -n $CPUSPERMODEL"
-	serial=$launcher
-	    ;;
-    mpirun)
-	parallel="$launcher -np $CPUSPERMODEL"
-	serial="bash"
-	;;
-esac
 
 # Variables for make
 #

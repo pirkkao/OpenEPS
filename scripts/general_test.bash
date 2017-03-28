@@ -27,5 +27,7 @@ for target in $VITAL_VARS; do
     test ! -z ${!target} || { echo "Non-existing var $target=${!target}"; exit 1; }
 done
 
+echo ${!L*}
+
 echo " ...tests passed!"
 echo

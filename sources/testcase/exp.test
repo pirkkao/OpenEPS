@@ -20,7 +20,7 @@ LEV=19
 FCL=3
 
 # Ensemble size
-ENS=10
+ENS=1
 
 # Resources
 # (number of nodes, number of cores per model,
