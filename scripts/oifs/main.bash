@@ -23,7 +23,7 @@ function day {
 } # THIS SHOULD EITHER BE IN HOUR FORMAT OR YOU SHOULD USE mandtg
 
 # Set program source, work directories and available resources
-for f in sources/*; do source $f; done
+for f in configs/*; do source $f; done
 
 
 #--------------------------------------------------------------

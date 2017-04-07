@@ -12,115 +12,79 @@ printf "\n\n4) Now in main.bash\n"
 
 
 # Set program source, work directories and available resources
-for f in sources/*; do source $f; done
+for f in configs/*; do source $f; done
 
 
 # Dummy routine for generating initial input
 #
 mkdir -p $DATA/$SDATE
 
+# Generate data structure for perturbations, add leading zeros so that $ENS
+# can be LARGE
 for i in $(seq 0 $ENS); do
-    # Add 1-2 leading zeros if ens member < 100
-    if [ $i -lt 10 ]; then i=00$i; elif [ $i -lt 100 ]; then i=0$i; fi
+    # Add leading zeros
+    i=$(printf "%03d" $i)
     mkdir -p  $DATA/$SDATE/pert$i
     echo >    $DATA/$SDATE/pert$i/infile_new
 done
 
 
-# Print the makefile in explicit form
-#
-makemake () {
-    
-    printf ".PHONY: all\n\n"
-    eval temp=$TARGET_A0 # cdate wont evaluate otherwise...
-    printf "all: %s\n\n"  "${temp}"
-    printf "%s : %s\n"    "${temp}"   "${ALL_TARGETS_A}"
-    printf "\t%s \n\n"    "${RULE_A}" 
-    
-    for itarget in $(echo {B..E}); do
-	eval ctarget='${'TARGET_${itarget}'0}'
-	eval dtarget='${'TARGET_${itarget}'1}'
-	eval etarget='${'RULE_${itarget}'}'
-	
-	if [ $itarget == "C" ]; then
-	    ddate=$ndate
-	else
-	    ddate=$cdate
-	fi
-	
-	printf "# Case %s = %s : %s\n" "$itarget" "$ctarget" "$dtarget"
-	
-	for i in $(seq 0 $ENS); do
-	    if [ $i -lt 10 ]; then i=00$i; elif [ $i -lt 100 ]; then i=0$i; fi
-	    if [ ! -z $dtarget ]; then
-		printf "%s/pert%s/%s : %s/pert%s/%s\n" "$ddate" $i \
-		       "${ctarget##*/}" "$cdate" $i "${dtarget##*/}"
-	    else
-		printf "%s/pert%s/%s : \n" "$cdate" $i "${ctarget##*/}"
-	    fi
-	done
-	printf "\t%s\n\n" "$etarget"
-    done
-}
-
 # Targets and rules for makefile
 #
-# TARGET_A0        - the final target that make will try to reach
-# TARGET_A1:N      - dependencies of TARGET_A
-# ALL_TARGETS_A1:N - dependencies as a complete list
+# TARGET_1   - the final target that make will try to reach
+# NEEDED_1   - dependencies of TARGET_1
+# RULE_1     - 
 #
-# TARGET_B0        - what TARGET_B will produce
-# TARGET_B1:N      - dependencies of TARGET_B
+# TARGET_2   - what TARGET_2 will produce
+# NEEDED_2   - dependencies of TARGET_2
 #
-# TARGET_C0        - what TARGET_C will produce
-# TARGET_C1:N      - dependencies of TARGET_C
+# TARGET_3   - what TARGET_3 will produce
+# NEEDED_3   - dependencies of TARGET_3
 #
-# TARGET_D0        - what TARGET_D will produce
-# TARGET_D1:N      - dependencies of TARGET_D
+# TARGET_4   - what TARGET_4 will produce
+# NEEDED_4   - dependencies of TARGET_4
 #
-# TARGET_E0        - what TARGET_E will produce
-# TARGET_E1:N      - dependencies of TARGET_E
+# TARGET_5   - what TARGET_5 will produce
+# NEEDED_5   - dependencies of TARGET_5
 #
-# RULE_A    - commands to execute once TARGET_A1:N are available
-# RULE_B    - commands to execute once TARGET_B1:N are available
-# RULE_C    - commands to execute once TARGET_C1:N are available
-# RULE_D    - commands to execute once TARGET_D1:N are available
-# RULE_E    - commands to execute once TARGET_E1:N are available
+# RULE_1    - commands to execute once NEEDED_1 are available
+# RULE_2    - commands to execute once NEEDED_2 are available
+# RULE_3    - commands to execute once NEEDED_3 are available
+# RULE_4    - commands to execute once NEEDED_4 are available
+# RULE_5    - commands to execute once NEEDED_5 are available
 
-TARGET_E0=%/infile
-TARGET_E1=""
-RULE_E='cd $(dir $@) ;  cp -f infile_new infile'
-export TARGET_E0 TARGET_E1 RULE_E
+TARGET_5=infile
+NEEDED_5=""
+RULE_5='cd $(dir $@) ;  cp -f infile_new infile'
+export TARGET_5 NEEDED_5 RULE_5
 
-TARGET_D0=%/outfile
-TARGET_D1=%/infile
-RULE_D='cd $(dir $@) ; echo > outfile'
-export TARGET_D0 TARGET_D1 RULE_D
+TARGET_4=oufile
+NEEDED_4=$TARGET_5
+RULE_4='cd $(dir $@) ; echo > outfile'
+export TARGET_4 NEEDED_4 RULE_4
 
-TARGET_C0=\${ndate}/%/infile_new
-TARGET_C1=\${cdate}/%/outfile
-RULE_C='mkdir -p $(dir $@); cd $(dir $@); echo > infile_new'
-export TARGET_C0 TARGET_C1 RULE_C
+TARGET_3=infile_new
+NEEDED_3=$TARGET_4
+RULE_3='mkdir -p $(dir $@); cd $(dir $@); echo > infile_new'
+export TARGET_3 NEEDED_3 RULE_3
 
-TARGET_B0=%/ppfile
-TARGET_B1=%/outfile
-RULE_B='cd $(dir $@) ; echo > ppfile'
-export TARGET_B0 TARGET_B1 RULE_B
+TARGET_2=ppfile
+NEEDED_2=$TARGET_4
+RULE_2='cd $(dir $@) ; echo > ppfile'
+export TARGET_2 NEEDED_2 RULE_2
 
-TARGET_A0=\${cdate}/date_finished
-TARGET_A1=ppfile
-TARGET_A2=infile_new
-RULE_A='echo > ${cdate}/date_finished'
-export TARGET_A0 ALL_TARGETS_A RULE_A
+TARGET_1=date_finished
+RULE_1='echo > date_finished'
+export TARGET_1 RULE_1 
+
 
 # Set programs
 makefile=${SCRI}/makefile
 
-
-cd $DATA
 export cdate ndate
 cdate=$SDATE
 while [ $cdate -le $EDATE ]; do
+    cd $DATA/$cdate
     # Log
     echo                                >> $WORK/master.log
     echo "Running ens for $cdate"       >> $WORK/master.log
@@ -130,19 +94,11 @@ while [ $cdate -le $EDATE ]; do
     # Define next date
     ndate=`exec $SCRI/./mandtg $cdate + $DSTEP`
 
-    # List all perturbation folders, trim and turn into an array
-    flist=$(ls -d $cdate/pert*)
-    flist=${flist//[$'\t\r\n']/ }; flist=( $flist )
-    flist_nextdate=${flist[@]//${cdate}\//${ndate}\/}; flist_nextdate=( $flist_nextdate )
+    # Generate makefile for current date
+    . ${SCRI}/write_makefile.bash  > foomakefile2
 
-    # Create list of items for ALL_TARGETS_A
-    # (add TARGET_A1 after flist elements and TARGET_A2 after flist_nextdate elements)
-    ALL_TARGETS_A1=${flist[@]/%//${TARGET_A1}}
-    ALL_TARGETS_A2=${flist_nextdate[@]/%//${TARGET_A2}}
-    ALL_TARGETS_A="$ALL_TARGETS_A1 $ALL_TARGETS_A2"
-
-    makemake > ${cdate}/foomakefile
-    make -f $makefile -j $PARALLELS_IN_NODE
+    # Execute
+    make -f foomakefile2 -j $PARALLELS_IN_NODE
     
     cdate=$ndate
 done
@@ -150,3 +106,4 @@ done
 set +e
 
 printf "\n\nOpenEPS finished \n"
+exit 1

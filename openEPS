@@ -14,8 +14,8 @@ export HOST=$(hostname | cut -c 1-5)
 
 # Import correct settings
 #
-source sources/${MODEL}/exp.$NAME # Experiment specific settings
-source sources/${MODEL}/env.$HOST # Environment specific settings
+source configs/${MODEL}/exp.$NAME # Experiment specific settings
+source configs/${MODEL}/env.$HOST # Environment specific settings
 
 # Broadcast general
 #

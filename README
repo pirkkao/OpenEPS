@@ -1,41 +1,50 @@
 # OpenEPS (Open Ensemble Prediction System)
 
-Ensemble Prediction System for OpenIFS build on top of Juha Lento's 
-MAKEMOTOR (see below).
+This is a versatile Ensemble Prediction System that provides the
+framework for running ensembles of different applications. So far
+scripts are available for running OpenIFS and a very simple testcase.
 
-Workflow:
-./launch_job.sh / bash launch_job.sh
- 1) initialize experiment (initjob.sh)
-    - Determine some crucial paths
-    - Modify scripts with path etc. information
-    - Adjust run parameters (nodes needed, wall clock time, 
-      model resolution, etc.)
+Workflow: (items in [] are TBD)
+./openEPS
+1) Read in configuration files that define both system and model
+   specific resources, paths, needed scripts, etc.
+   (configs/$MODEL/exp.$NAME)
+   (configs/$MODEL/env.$HOST)
 
- 2) submit batchjob (job.bash)
-    - Loop over wanted dates and for each given date
-      i)   generate initial states for the model
-          (generate parameter perturbations)
-      ii)  run the model
-      iii) post process and evaluate the runs
-           (update parameter distributions)
-           (clean up)
-    - Makefile handles this workflow for each date
+2) Test all needed files etc. are present
+   (scripts/general_test.bash)
 
-ISSUES (December 30th):
+3) Initialize experiment
+    - Create experiment structure (create paths, copy scripts)
+    - Calculate resource allocation, i.e. how much can be run
+      parallel
+   [- Modify patch job resource requirements ]
+    - Adjust model namelist(s) accordingly
+   [- Adjust post processing scripts ] 
+   (scripts/general_init.bash)  
 
-i) Start date initial state and parameter generations are now done 
-in initjob.sh. This could/should be done in job.bash. You could build
-this routine to the makefile and make it before entering the date loop.
+ 4) Submit batchjob, or launch a new bash shell
+    Note that this job should be written separately for each model
+    (so far OpenIFS and testcase have this)!
+    - Generate parallel structure for data [ SHOULD BE MOVED ]
+    - Generate input for first date [ SHOULD BE MOVED ]
+    - Define targets and rules for makefile
+    - Loope over datelist, and for each date
+      i)  Write out an explicit makefile
+      ii) Execute the makefile
 
-ii) This has not been tested with multiple jobs (i.e. only job1 as input). 
-The workflow should in *theory* be correct, but I predict problems with 
-determining which job we are in when running make (nid variable probably 
-gets multiple entries). The individual jobs need to be able to be identified 
-with some nid, otherwise it'll be hard to really parallelize the jobs.
-The nid thing is a bit chaotic at the moment in the code (the job folders are
-named nid, but identity to various tasks is given in 00${nid - 1}) be sure 
-to make it more uniform! I'd also name the job folders as "ctrl, pert001,
-pert002,... makes the readability more understandable!
+Job scheduling is handled via the makefile, the workflow within
+the makefile may depend on the application. For instance, OpenIFS
+can be run in
+"forecasts only"-mode:
+1) link initial states for each ens member
+2) once initial states are available, run the model
+3) once model output is available, go to next date
+
+[ "EPS emulator"-mode ]
+[ "parameter estimation"-mode ]
+
+ISSUES/TBD (7th April 2017):
 
 iii) There is no real initial state generation process now. Hopefully 
 Glenn's solution for the vertical and horizontal resolution changes are
@@ -76,56 +85,9 @@ lat-lon points results in an "Illegal action". Sorry for not having time
 to debug this but it is currently 22:17 and I need to go sleep and prepare
 for England!
 
-viii) I currently have no idea how to handle the model run itself because 
-make is already doing aprun, and the model should be submitted via 
-something similiar (now there is a second aprun in runmodel which 
-unsurprisingly does not work). The model itself runs if submitting an 
-individual job in the job folder.
-
 ix) Smaller bugs:
 
 
 Pirkka Ollinaho, pirkka.ollinaho@fmi.fi
-December 30, 2014
+7th April 2017
 
-
-
-% MAKEMOTOR
-% Juha Lento, juha.lento@csc.fi
-% December 6, 2014
-
-# MAKEMOTOR
-
-Run an iterative parameter search type algorithm with multiple concurrent
-function evaluations in a single job reservation.
-
-~~~~
- 
-           funceval             pargen           funceval           pargen
- input 1/1  ----->  output 1/1 \  -->  input 2/1  ----->  output 2/1 \  -->
- input 2/1  ----->  output 2/1  \ -->  input 2/1  ----->  output 2/1  \ -->
-   ...      ----->    ...       / -->    ...      ----->    ...       / -->
- input N/1  ----->  output N/1 /  -->  input 2/1  ----->  output 2/1 /  -->
-
-           |< --------  iteration 1  --------- >||< ------- iteration 2 --
-~~~~
-
-Parameter generation, `pargen`, requires all outputs from the previous
-iteration to generate new inputs for the next iteration function
-evaluation, `funceval`, thus effectively seriallizing the
-calculation. However, function evaluations, which themselves can be
-parallel programs, are run in parallel, using the resources allocated.
-
-
-# Demo
-
-Download <https://kannu.csc.fi/public.php?service=files&t=6fa69da4c1435bea565bfa12c24cd0ef>
-
-~~~~
- 
- > tar xvf makemotor.tar.gz
- # Check/edit makemotor/job.bash, possibly other files, too.
- # > bash makemotor/job.bash
- # or
- # > sbatch makemotor/job.bash
-~~~~

@@ -25,7 +25,7 @@ done
 # Copy sources
 #
 for item in ${MODEL}/exp.$NAME ${MODEL}/env.$HOST; do
-    cp -f sources/$item $SRC/.
+    cp -f configs/$item $SRC/.
 done
 
 
