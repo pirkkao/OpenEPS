@@ -17,11 +17,6 @@
 set -e
 printf "\n\n4) Now in job.bash\n"
 
-# Helper function for formatting dates (YYYYMMDD)
-function day {
-    date +%Y%m%d -d "$1"
-} # THIS SHOULD EITHER BE IN HOUR FORMAT OR YOU SHOULD USE mandtg
-
 # Set program source, work directories and available resources
 for f in configs/*; do source $f; done
 
@@ -46,10 +41,12 @@ cat <<EOF > params
 1.4
 EOF
 
-for i in $(seq $ENS); do
- mkdir -p $SCRI/$SDATE/job$i
- echo >   $SCRI/$SDATE/job$i/input
- sed -n ${i}p params > job${i}/para
+for i in $(seq 0 $ENS); do
+    # Add leading zeros
+    i=$(printf "%03d" $i)
+    mkdir -p  $DATA/$SDATE/pert$i
+    echo >    $DATA/$SDATE/pert$i/infile_new
+    #sed -n ${i}p params > job${i}/para
 
  if false; then
  # Initial states
@@ -75,57 +72,25 @@ cd $DATA
 test -d $SDATE || cp -r ${SCRI}/$SDATE .
 
 
-# Variables for make
-#
-# GENERATE   - command to generate NEW_INPUTS from OUTPUTS
-# RUNEPS     - command to generate model output
-# EVALUATE   - command to generate OUTPUTS from OLD_INPUTS
-# INFILE     - name of the input file for EVALUATE command, must exist
-# OUTFILE    - name of the output file for EVALUATE command
-# OUTPUTS    - list of OUTFILEs 
-# NEW_INPUTS - INFILEs for the next step, the goal of this make step
-
-export EVALUATE GENPARS GENLINK RUNEPS
-export INFILE LINKFILE OUTFILE OUTPUTS NEW_INPUTS DATA cdate
-
-
-# Set programs
-pargen=${SCRI}/pargen
-model_link=${SCRI}/link.bash
-model_run=$MODEL_EXE
-funceval=${SCRI}/funceval
-makefile=${SCRI}/makefile
-
-INFILE=input
-LINKFILE=
-OUTFILE=output
-POSTPRO=eval
-GENPARS="$serial ${pargen}"
-#GENPARS="echo"
-GENLINK="$serial ${model_link}"
-RUNEPS="$GENLINK ; $parallel ${model_run} -e teps"
-#RUNEPS="echo > output"
-EVALUATE="$serial $funceval"
-
+export cdate ndate
 cdate=$SDATE
 while [ $cdate -le $EDATE ]; do
+    cd $DATA/$cdate
     # Log
     echo                                >> $WORK/master.log
     echo "Running ens for $cdate"       >> $WORK/master.log
     date | echo `exec cut -b13-21` init >> $WORK/master.log
-
     echo "   Processing date $cdate"
+    
+    # Define next date
     ndate=`exec $SCRI/./mandtg $cdate + $DSTEP`
-    flist=$(ls $cdate/job*/input)
-    flist=${flist//[$'\t\r\n']/ }
-    #OUTPUTS=${flist//\/input/\/output}
-    OUTPUTS=${flist//\/input/\/output}
-    NEW_INPUTS=${flist//${cdate}\//${ndate}\/}
-    # temp solution
-    mkdir -p $cdate/inistates
-
+    
+    # Generate makefile for current date
+    . ${SCRI}/define_makefile.bash
+    . ${SCRI}/write_makefile.bash  > foomakefile2
+    
     #make -f $makefile -j $njobs
-    make -f $makefile -j $PARALLELS_IN_NODE
+    make -f foomakefile2 -j $PARALLELS_IN_NODE
     
     cdate=$ndate
 done
@@ -133,3 +98,4 @@ done
 set +e
 
 printf "\n\nOpenEPS finished \n"
+exit 1

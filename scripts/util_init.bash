@@ -32,7 +32,7 @@ done
 # --------------------------------------------------------------
 # RESOURCE ALLOCATION
 # --------------------------------------------------------------
-source scripts/general_resource_alloc.bash
+source scripts/util_resource_alloc.bash
 
 printf "   *************************************************************\n"
 printf "   OpenEPS will reserve $totncpus cores on $NNODES node(s) for $reservation minutes!\n"
@@ -58,7 +58,7 @@ printf "   *************************************************************\n"
 # Modify number of cores, timestepping, select output variables, etc.
 #
 for item in $REQUIRE_NAMEL; do
-    source scripts/$MODEL/$item
+    . scripts/$MODEL/$item
 done
 
 

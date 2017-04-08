@@ -36,7 +36,7 @@ export RES LEV FCL ENS NNODES
 # --------------------------------------------------------------
 # Model structure and programs that are needed
 REQUIRE_DIRS="WORK SCRI DATA SRC"
-REQUIRE_ITEMS="main.bash ../makefile pargen ../mandtg ../general_tools.bash write_makefile.bash"
+REQUIRE_ITEMS="../main.bash ../makefile pargen ../mandtg ../util_tools.bash write_makefile.bash define_makefile.bash"
 
 
 # --------------------------------------------------------------

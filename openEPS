@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Launch an EPS job. Period.
+# Launch an EPS job.
 #
 #
 # Authors: pirkka.ollinaho@fmi.fi
@@ -25,11 +25,11 @@ printf '\n%s\n\n' "Start date for ensemble is $SDATE and end date $EDATE"
 
 # Check that all vital paths/executables exist
 #
-source scripts/general_test.bash
+source scripts/util_test.bash
 
 # Initialize
 #
-source scripts/general_init.bash
+source scripts/util_init.bash
 
 
 # Launch bash/batch job

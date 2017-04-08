@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Get process id
-nid=$(pwd | grep -o -P 'job.{0,5}' | sed -e 's/job//g')
+nid=$(pwd | grep -o -P 'pert.{0,5}' | sed -e 's/job//g')
 
 # Log
 date | echo `exec cut -b13-21` runmodel ${nid} >> $WORK/master.log
@@ -34,7 +34,11 @@ ln -sf /home/ollin/projects/OIFS/oifs38r1v04/t21test2/ifsdata/ .
 
 ln -sf ${IFSDATA}/climatology ./ifsdata
 ln -sf ${IFSDATA}/rtables
-ln -sf ${IFSDATA2}/38r1/climate/${RES}l_2
+if [ $RES -eq 21 ]; then
+    ln -sf ${IFSDATA}/38r1/climate/${RES}_full
+else
+    ln -sf ${IFSDATA}/38r1/climate/${RES}l_2
+fi
 
 cp -f $SCRI/${EXPS}.namelist fort.4
 #cp -f /home/ollin/projects/OIFS/oifs38r1v04/t21test2/fort.4 .
