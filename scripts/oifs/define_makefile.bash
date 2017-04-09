@@ -33,12 +33,12 @@ export TARGET_5 NEEDED_5 RULE_5
 TARGET_4=oufile
 NEEDED_4=$TARGET_5
 # First part should not be evaluated, second should
-RULE_4=$(printf "%s%s" 'cd $(dir $@) ;' "$parallel $MODEL_EXE -e $EXPS")
+RULE_4=$(printf "%s%s" 'cd $(dir $@) ;' "$serial ${SCRI}/run.bash ; $parallel $MODEL_EXE -e $EXPS ; $serial ${SCRI}/run.bash finish")
 export TARGET_4 NEEDED_4 RULE_4
 
 TARGET_3=infile_new
 NEEDED_3=$TARGET_4
-RULE_3='mkdir -p $(dir $@); cd $(dir $@); echo > infile_new'
+RULE_3=$(printf "%s%s%s" 'mkdir -p $(dir $@); cd $(dir $@); ' "$serial ${SCRI}/link.bash $ndate" '; echo > infile_new')
 export TARGET_3 NEEDED_3 RULE_3
 
 TARGET_2=ppfile

@@ -7,7 +7,7 @@
 # GENERAL
 # --------------------------------------------------------------
 # Basics
-EXPL="testiEPS5"  # Long exp name
+EXPL="testiEPS"  # Long exp name
 EXPS="test"       # 4 letter exp name
 SDATE=2013110212  # Exp start date
 EDATE=2013110312  # Exp end   date
@@ -36,7 +36,7 @@ export RES LEV FCL ENS NNODES
 # --------------------------------------------------------------
 # Model structure and programs that are needed
 REQUIRE_DIRS="WORK SCRI DATA SRC"
-REQUIRE_ITEMS="../main.bash ../makefile pargen ../mandtg ../util_tools.bash write_makefile.bash define_makefile.bash"
+REQUIRE_ITEMS="../main.bash pargen ../mandtg ../util_tools.bash write_makefile.bash define_makefile.bash"
 
 
 # --------------------------------------------------------------

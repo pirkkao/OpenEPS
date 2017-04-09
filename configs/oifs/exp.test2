@@ -7,17 +7,17 @@
 # GENERAL
 # --------------------------------------------------------------
 # Basics
-EXPL="testiEPS6"  # Long exp name
-EXPS="teps"       # 4 letter exp name
+EXPL="testiEPS5"  # Long exp name
+EXPS="tep2"       # 4 letter exp name
 SDATE=2013110212  # Exp start date
 EDATE=2013110212  # Exp end   date
 DSTEP=24          # Hours between ensembles
 export EXPL EXPS SDATE EDATE DSTEP
 
 # Resolution, vertical levels, model run length (in h)
-RES=21
-LEV=19
-FCLEN=6
+RES=255
+LEV=91
+FCLEN=3
 
 # Ensemble size (CTRL is always member 0, so real size is ENS+1)
 ENS=1
@@ -30,7 +30,7 @@ LSKEB="false" # "true" does not work with cy38r1
 # (number of nodes, number of cores per model,
 # estimate of model execution time)
 NNODES=1
-CPUSPERMODEL=2
+CPUSPERMODEL=4
 TIMEFORMODEL=0.5
 export RES LEV FCLEN ENS NNODES
 
@@ -64,8 +64,8 @@ VITAL_VARS="$VITAL_VARS EXPL EXPS SDATE EDATE DSTEP RES LEV FCLEN ENS NNODES"
 # --------------------------------------------------------------
 
 # Output frequency
-NFRPOS="6"
-NFRHIS="6"
+NFRPOS="3"
+NFRHIS="3"
 NPOSTS=0
 NHISTS=0
 

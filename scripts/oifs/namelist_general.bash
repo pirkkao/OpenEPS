@@ -10,19 +10,16 @@ if [ $RES -eq 639 ]; then
     lat=384
     lev=91
     tim=900.0
-    OUTP=24
 elif [ $RES -eq 255 ]; then
     lon=768
     lat=384
     lev=91
     tim=2700.0
-    OUTP=24
 elif [ $RES -eq 21 ]; then
     lon=64
     lat=32
     lev=19
     tim=600.0
-    OUTP=10
 else
     echo "Resolution not defined!"
     exit 1
@@ -44,11 +41,14 @@ TSTEP=${tim:-2700.0}
 LEV=$lev
 NFPMAX=${RES:-255}
 
-#NAMCT0  - Change experiment name and output time interval
+#NAMCT0  - Change experiment name, run length and output time interval
 CNMEXP=$EXPS
-NFRPOS=$OUTP
-NFRHIS=$OUTP
-
+NSTOP=$FCLEN
+NFRPOS=$NFRPOS
+NFRHIS=$NFRHIS
+NPOSTS=0
+NHISTS=0
+ 
 #NAMFPC  - Change output fields
 
 # Model level variables, their count and model levels
@@ -72,3 +72,51 @@ NFPPHY=${#varpp[@]}
 #NAMFPD  - Change grid point variables' output resolution
 NLAT=$lat
 NLON=$lon
+
+
+# Add grib identification information
+NAMGRIB="
+&NAMGRIB
+   NLOCGRB=30,
+   NLEG=1,
+   NENSFNB=$imem,
+   NTOTENS=$(( ENS + 1 )),
+   NREFERENCE=0,
+/"
+
+if [ $imem -eq 0 ]; then
+    CTYPE="cf"
+else
+    CTYPE="pf"
+fi
+
+# Add SPPT switches if TRUE
+if [ $LSPPT == "true" ]; then
+    NAMSPSDT="
+    &NAMSPSDT
+      LSPSDT=true,
+      NSCALES_SDT=3,
+      SDEV_SDT=0.52,0.18,0.06,
+      TAU_SDT=2.16e4,2.592e5,2.592e6,
+      XLCOR_SDT=500.e3,1000.e3,2000.e3,
+    /"
+else
+    NAMSPSDT="
+    &NAMSPSDT
+      LSPSDT=false,
+    /" 
+fi
+
+# Add SKEB switches if TRUE
+if [ $LSKEB == "true" ]; then
+    NAMSTOPH="
+    &NAMSTOPH
+      LSTOPH_SPBS=true,
+      RATIO_BACKSCAT=0.36,
+    /"
+else
+    NAMSTOPH="
+    &NAMSTOPH
+      LSTOPH_SPBS=false,
+    /"
+fi    

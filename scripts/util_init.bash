@@ -45,20 +45,20 @@ printf "   *************************************************************\n"
 #--------------------------------------------------------------
 # If sending the job as bulk, modify job.bash
 #
-#sed -i -e "s/.*SBATCH -p test.*/#SBATCH -p $SQUEUE/g"   $SCRI/main.bash
-#sed -i -e "s/.*SBATCH -J test.*/#SBATCH -J $EXPS/g"     $SCRI/main.bash
-#sed -i -e "s/.*SBATCH -t 5.*/#SBATCH -t $reservation/g" $SCRI/main.bash
-#sed -i -e "s/.*SBATCH -N 2.*/#SBATCH -N $NNODES/g"      $SCRI/main.bash
-#sed -i -e "s/per-node=16/per-node=$cpuspernode/g"       $SCRI/main.bash
-
-
+if [ ! -z $SEND_AS_SINGLEJOB ] || [ ! -z $SEND_AS_MULTIJOB] ; then
+    . scripts/util_batchjob.bash
+fi
+	
 #--------------------------------------------------------------
 # MODIFY RUN NAMELIST
 #--------------------------------------------------------------
-# Modify number of cores, timestepping, select output variables, etc.
+# Modify number of cores, timestepping, select output variables,
+# identify ens members, set stochastic physics, etc.
 #
-for item in $REQUIRE_NAMEL; do
-    . scripts/$MODEL/$item
+for imem in $(seq 0 $ENS); do
+    for item in $REQUIRE_NAMEL; do
+	. scripts/$MODEL/$item
+    done
 done
 
 

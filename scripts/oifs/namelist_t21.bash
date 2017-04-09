@@ -3,7 +3,13 @@
 # Create a namelist
 #
 
-cat <<EOF > $SCRI/$EXPS.namelist
+if [ $imem -eq 0 ]; then
+    name="ctrl"
+else
+    name=$(printf "pert%03d" $imem)
+fi
+    
+cat <<EOF > $SCRI/namelist.$name
 &NAMDIM
 NPROMA=-24,
 /
@@ -28,13 +34,14 @@ YS_NL%NREQIN=-1,
  LFPOS=TRUE,
  LREFOUT=false,
  N3DINI=0,
- NSTOP=9,
+ NSTOP=$NSTOP,
  NFRDHP=1,
  NFRDHFD=1,
- NFRHIS=$NFRPOS,
+ NFRHIS=$NFRHIS,
  NFRPOS=$NFRPOS,
- NPOSTS=0,
- NHISTS=0,
+ NPOSTS=$NPOSTS,
+ NHISTS=$NHISTS,
+ CTYPE="$CTYPE",
  NFRSDI=1, 
  LSLAG=true,
  LSLPHY=.false.,
@@ -70,13 +77,6 @@ YS_NL%NREQIN=-1,
 &NAMGEM
   NHTYP=0,
 /   
-&NAMDPHY
- NVEXTR=25,
- NCEXTR=19,
-/   
-&NAMPHYDS
- NVEXTRAGB(1:24)=91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,
-/
 &NAMDPHYDS
 /
 &NAMDDH
@@ -117,6 +117,9 @@ YS_NL%NREQIN=-1,
     NFPPHY=$NFPPHY,
     MFPPHY(1:)=$MFPPHY,
 /
+$NAMGRIB
+$NAMSPSDT
+$NAMSTOPH
 &NAEAER
 /
 &NAEPHY

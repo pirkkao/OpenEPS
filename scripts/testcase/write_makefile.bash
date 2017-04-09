@@ -5,6 +5,9 @@ nextdate="../$ndate/"
 
 source $SCRI/util_tools.bash
 
+# KEEP ALL FILES
+printf "%s\n"    ".SECONDARY :"
+
 # GOALS
 printf "%s\n"    ".PHONY : all"
 printf "%s\n"    "all : $date$TARGET_1"
