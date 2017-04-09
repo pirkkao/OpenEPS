@@ -72,7 +72,6 @@ YS_NL%NREQIN=-1,
 &NAERAD
  NRPROMA=-24,
  CRTABLEDIR="/home/user/oifs/ifsdata/rtable/", ! modify this for your installation
- LDBLRAD=false,
 /   
 &NAMGEM
   NHTYP=0,

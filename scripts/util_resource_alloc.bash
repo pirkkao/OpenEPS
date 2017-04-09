@@ -48,7 +48,7 @@ launcher=$(basename $(which aprun 2> /dev/null || which srun 2> /dev/null || whi
 case "$launcher" in
     aprun|srun)
 	parallel="$launcher -n $CPUSPERMODEL"
-	serial=$launcher
+	serial="bash"
 	    ;;
     mpirun)
 	parallel="$launcher -np $CPUSPERMODEL"
