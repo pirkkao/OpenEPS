@@ -31,7 +31,7 @@ printf "\n"
 
 # TARGET 4
 for ((imem=0;imem<=ENS;imem++)); do
-    printf "%s\n"   "$(one_member $imem $TARGET_4 $NEEDED_4 $date)"
+    printf "%s\n"   "$(one_member${EXTRA_4} $imem $TARGET_4 $NEEDED_4 $date)"
     printf "\t%s\n" "$RULE_4"
 done
 printf "\n"
@@ -42,3 +42,12 @@ for ((imem=0;imem<=ENS;imem++)); do
     printf "\t%s\n" "$RULE_5"
 done
 printf "\n"
+
+# TARGET 6
+if [ ! -z $TARGET_6 ]; then
+    for ((imem=0;imem<=ENS;imem++)); do
+	printf "%s\n"   "$(one_member $imem $TARGET_6 $NEEDED_6 $date)"
+	printf "\t%s\n" "$RULE_6"
+    done
+    printf "\n"
+fi

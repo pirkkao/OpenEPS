@@ -24,17 +24,30 @@
 # RULE_4    - commands to execute once NEEDED_4 are available
 # RULE_5    - commands to execute once NEEDED_5 are available
 
+if [ ! -z $LPAR ]; then
+    if [ $LPAR == "true" ]; then
+	TARGET_6=parfile
+	NEEDED_6=""
+	RULE_6=$(printf "%s%s" 'cd $(dir $@) ;' "$serial ${SCRI}/pargen")
+	export TARGET_6 NEEDED_6 RULE_6
+	EXTRA_4="_2dep"
+	export EXTRA_4
+    fi
+else
+    TARGET_6=""
+fi
+
 TARGET_5=infile
 NEEDED_5=""
 # First part should not be evaluated, second should
 RULE_5=$(printf "%s%s" 'cd $(dir $@) ;' "$serial ${SCRI}/link.bash")
 export TARGET_5 NEEDED_5 RULE_5
 
-TARGET_4=oufile
-NEEDED_4=$TARGET_5
+TARGET_4=outfile
+NEEDED_4="$TARGET_5 $TARGET_6"
 # First part should not be evaluated, second should
 RULE_4=$(printf "%s%s" 'cd $(dir $@) ;' "$serial ${SCRI}/run.bash ; $parallel $MODEL_EXE -e $EXPS ; $serial ${SCRI}/run.bash finish")
-export TARGET_4 NEEDED_4 RULE_4
+export TARGET_4 NEEDED_4 RULE_4 
 
 TARGET_3=infile_new
 NEEDED_3=$TARGET_4
@@ -43,9 +56,9 @@ export TARGET_3 NEEDED_3 RULE_3
 
 TARGET_2=ppfile
 NEEDED_2=$TARGET_4
-RULE_2='cd $(dir $@) ; echo > ppfile'
+RULE_2=$(printf "%s%s%s" 'cd $(dir $@) ; ' "$serial ${SCRI}/ppro.bash \"$NPPRO\" "  ' ; echo > ppfile')
 export TARGET_2 NEEDED_2 RULE_2
 
 TARGET_1=date_finished
-RULE_1='echo > date_finished'
+RULE_1=$(printf "%s%s" "$serial ${SCRI}/ppro_ens.bash \"$NPPRO\"" ' ; echo > date_finished')
 export TARGET_1 RULE_1 

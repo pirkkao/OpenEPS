@@ -1,45 +1,31 @@
 #!/bin/bash
 
 # Get process id 
-nid=$(pwd | grep -o -P 'job.{0,5}' | sed -e 's/job//g')
-date | echo `exec cut -b13-21` pargen ${nid} >> $WORK/master.log
+nid=$(pwd | grep -o -P 'pert.{0,5}' | sed -e 's/pert//g')
 
-# Name nid=1 control run and other jobs pert$nid-1 
-# Also, give nid three digits (clearer for job organization) 
-#
-nid=$(echo "$nid - 1" | bc)
-if [ $nid -eq 0 ]; then
- name=ctrl
-elif [ $nid -lt 10 ]; then
- name=pert00$nid
-elif [ $nid -lt 100 ]; then
- name=pert0$nid
-else
-    name=pert$nid
-fi
-
-if false; then
-# Initial states
-#
-for item in GG SH; do # CL GG SH; do
- if [ $item == GG ]; then
-  cp -f ${INIBASEDIR}/$cdate/${name}_ICM${item}_INIUA $cdate/inistates/${name}_ICM$item${EXPS}INIUA
- fi
- cp -f  ${INIBASEDIR}/$cdate/${name}_ICM${item}_INIT $cdate/inistates/${name}_ICM$item${EXPS}INIT
-done
-fi
+# Log
+echo `date +%H:%M:%S` parwrite pert${nid} >> $WORK/master.log
 
 # Parameter perturbations
 #
 if [ $nid -gt 0 ]; then
- read par1 < $cdate/job${nid}/para
- echo "Using par1 value $par1"
- # WRITE NEW PARAMETER VALUES TO namelist HERE
- # &NAMCUMF
- #  ENTRORG=$par1
- # /
+    #read par1 < $cdate/pert${nid}/para
+    if [ $nid -eq 1 ]; then
+	par1=1.9
+    elif [ $nid -eq 2 ]; then
+	par1=2.1
+    else
+	par1=2.2
+    fi
+    
+    echo "Using par1 value $par1" > parfile
+    # WRITE NEW PARAMETER VALUES TO namelist HERE
+    # &NAMCUMF
+    #  ENTRORG=$par1
+    # /
+    sed -i -e "s#ENTSHALP=2.0#ENTSHALP=$par1#g" $SCRI/namelist.pert${nid}
 else
- echo "Ctrl run"
+ echo "Ctrl run" > parfile
  # EITHER WRITE BLANK VALUES TO NAMELIST OR DO NOTHING
  # &NAMCUMF
  # /

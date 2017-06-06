@@ -23,3 +23,17 @@ one_member () {
 	printf "${date}pert%03d/%s :" $imem $target
     fi
 }
+
+one_member_2dep () {
+    local imem=$1
+    local target=$2
+    local needed1=$3
+    local needed2=$4
+    local date=${5:-""}
+    local date2=${6:-""}
+    if [ ! -z $needed1 ]; then
+	printf "${date}pert%03d/%s : ${date2}pert%03d/%s ${date2}pert%03d/%s" $imem $target $imem $needed1 $imem $needed2
+    else
+	printf "${date}pert%03d/%s :" $imem $target
+    fi
+}

@@ -59,7 +59,7 @@ NRFP3S=${LEVSM// /,}
 # Pressure level variables,their count and pressure levels (in Pa)
 MFP3DFP=${VARSP// /,}
 NFP3DFP=${#varsp[@]}
-RFP3P=$LEVSP
+RFP3P=${LEVSP// /,}
 
 # Surface level dynamic variables and their count
 MFP2DF=${VARSS// /,}

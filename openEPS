@@ -8,8 +8,8 @@
 
 # Run options
 #
-export NAME=test
-export MODEL=testcase
+export NAME=test3
+export MODEL=oifs
 export HOST=$(hostname | cut -c 1-5)
 
 # Import correct settings
@@ -20,7 +20,7 @@ source configs/${MODEL}/env.$HOST # Environment specific settings
 # Broadcast general
 #
 printf '\n%s\n'   "OpenEPS `git tag | tail -n1`"
-printf '\n%s'     "Running an ensemble of $((ENS+1))-members for ${MODEL^^}."
+printf '\n%s'     "Running an ensemble of $((ENS+1))-members for ${MODEL}."
 printf '\n%s\n\n' "Start date for ensemble is $SDATE and end date $EDATE"
 
 # Check that all vital paths/executables exist

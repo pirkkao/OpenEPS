@@ -5,7 +5,7 @@
 # or not to the jobqueue, modify namelists.
 #
 set -e
-printf "\n2) Initializing ${MODEL^^} ensemble $EXPL...\n"
+printf "\n2) Initializing ${MODEL} ensemble $EXPL...\n"
 
 
 # --------------------------------------------------------------
