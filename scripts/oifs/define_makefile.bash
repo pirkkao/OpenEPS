@@ -28,12 +28,13 @@ if [ ! -z $LPAR ]; then
     if [ $LPAR == "true" ]; then
 	TARGET_6=parfile
 	NEEDED_6=""
-	RULE_6=$(printf "%s%s" 'cd $(dir $@) ;' "$serial ${SCRI}/pargen")
+	RULE_6=$(printf "%s%s" 'cd $(dir $@) ;' "$serial ${SCRI}/par_set.bash")
 	export TARGET_6 NEEDED_6 RULE_6
 	EXTRA_4="_2dep"
 	export EXTRA_4
     fi
 else
+    EXTRA_4=""
     TARGET_6=""
 fi
 
@@ -60,5 +61,13 @@ RULE_2=$(printf "%s%s%s" 'cd $(dir $@) ; ' "$serial ${SCRI}/ppro.bash \"$NPPRO\"
 export TARGET_2 NEEDED_2 RULE_2
 
 TARGET_1=date_finished
-RULE_1=$(printf "%s%s" "$serial ${SCRI}/ppro_ens.bash \"$NPPRO\"" ' ; echo > date_finished')
+RULE_1=$(printf "%s%s" "$serial ${SCRI}/ppro_ens.bash \"$NPPRO\"")
+
+if [ ! -z $LPAR ]; then
+    if [ $LPAR == "true" ]; then
+	RULE_1="$RULE_1 ; $serial ${SCRI}/par_gen.bash $ndate"
+    fi
+fi
+
+RULE_1="$RULE_1  ; echo > date_finished"
 export TARGET_1 RULE_1 

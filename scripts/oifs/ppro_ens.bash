@@ -8,7 +8,7 @@ steps=${1:-"0000"}
 # Log
 echo `date +%H:%M:%S` post-pro "ens   " >> $WORK/master.log
 
-# Can only do for ENS > 1
+# Makes only sense for ENS > 1
 if [ $ENS -gt 1 ]; then
     for step in $steps; do
 	# Constuct namelist

@@ -26,11 +26,19 @@ for i in $(seq 0 $ENS); do
     echo >    $DATA/$SDATE/pert$i/infile_new
 done
 
+# Parameter estimation
+if [ ! -z $LPAR ]; then
+    if [ $LPAR == "true" ]; then
+	. $SCRI/par_gen.bash $SDATE
+    fi
+fi
+
 
 # Loop over dates
 #
 export cdate ndate
 cdate=$SDATE
+
 while [ $cdate -le $EDATE ]; do
     cd $DATA/$cdate
     # Log

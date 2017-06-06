@@ -3,6 +3,9 @@
 This is a versatile Ensemble Prediction System that provides the
 framework for running ensembles of different applications. So far
 scripts are available for running OpenIFS and a very simple testcase.
+There is still quite much to do, and the structure will likely
+be changed until everything is clean and understandable.
+So, please be patient when using!
 
 Workflow: (items in [] are TBD)
 ./openEPS
@@ -13,6 +16,7 @@ Workflow: (items in [] are TBD)
 
 2) Test all needed files etc. are present
    (scripts/general_test.bash)
+   [this needs still some clean up]
 
 3) Initialize experiment
     - Create experiment structure (create paths, copy scripts)
@@ -20,7 +24,7 @@ Workflow: (items in [] are TBD)
       parallel
    [- Modify patch job resource requirements ]
     - Adjust model namelist(s) accordingly
-   [- Adjust post processing scripts ] 
+    - Adjust post processing scripts  
    (scripts/general_init.bash)  
 
  4) Submit batchjob, or launch a new bash shell
@@ -28,7 +32,7 @@ Workflow: (items in [] are TBD)
     (so far OpenIFS and testcase have this)!
     - Generate parallel structure for data [ SHOULD BE MOVED ]
     - Generate input for first date [ SHOULD BE MOVED ]
-    - Define targets and rules for makefile
+    - Define targets and rules for makefile [ SHOULD BE RESTUCTURED ]
     - Loope over datelist, and for each date
       i)  Write out an explicit makefile
       ii) Execute the makefile
@@ -44,7 +48,7 @@ can be run in
 [ "EPS emulator"-mode ]
 [ "parameter estimation"-mode ]
 
-ISSUES/TBD (7th April 2017):
+ISSUES/TBD (6th June 2017):
 
 iii) There is no real initial state generation process now. Hopefully 
 Glenn's solution for the vertical and horizontal resolution changes are
@@ -53,41 +57,13 @@ the job to minimize the need for diskspace (remember to delete all
 unnecessary files after a date!), this would also allow for a flexible
 system if the system is run with different resolutions.
 
-iv) Model parameter changes are handled via namelists. To modify a 
-parameter in a run, find out to which namelist it belongs and add an entry
-to fort.4 (or rather to namelist before copying):
-&NAMCUMF
-/
-
-==>
-
-&NAMCUMF
- ENTRORG=2.0,
-/
-
-v) Initial states and parameter changes are now done in same script 
-(pargen). These could be separate processes depending how heavy the 
-initial state generation will be.
-
 vi) Cost function calculation needs an analysis field to which it can
 compare the forecast to. The model initial (control) states can be used
 as these, but I'd suggest extracting the necessary fields out and storing
 them somewhere prior to runs so the file reading won't take so long.
 
-vii) The post processing needs a lot of polishing (funceval), I've only made it 
-work to one case and have hardcoded all paths etc. sed these in from initjob
-to make it nicer, also you have to consider how the parallel application 
-works with nids.
-There are some !! NOTES in the fortran file, these need to be addressed
-in order to get e.g. areal weighting to work.
-Also, there is something sinister going on in the fields, doing a SUM over
-lat-lon points results in an "Illegal action". Sorry for not having time 
-to debug this but it is currently 22:17 and I need to go sleep and prepare
-for England!
-
-ix) Smaller bugs:
 
 
 Pirkka Ollinaho, pirkka.ollinaho@fmi.fi
-7th April 2017
+6th June 2017
 
