@@ -1,0 +1,56 @@
+#!/bin/bash
+#
+# EXPERIMENT SPECIFIC SETTINGS
+#
+
+# --------------------------------------------------------------
+# GENERAL
+# --------------------------------------------------------------
+# Basics
+EXPL="testiEPSa"  # Long exp name
+EXPS="test"       # 4 letter exp name
+SDATE=2013110212  # Exp start date
+EDATE=2013110512  # Exp end   date
+DSTEP=24          # Hours between ensembles
+export EXPL EXPS SDATE EDATE DSTEP
+
+# Resolution, vertical levels, model run length (in h)
+RES=21
+LEV=19
+FCL=3
+
+# Ensemble size (total number = ENS + 1)
+ENS=9
+
+# Resources
+# (number of nodes, number of cores per model,
+# estimate of model execution time)
+NNODES=1
+CPUSPERMODEL=1
+TIMEFORMODEL=0.5
+export RES LEV FCL ENS NNODES
+
+
+# --------------------------------------------------------------
+# REQUIRED DIRS AND SCRIPTS
+# --------------------------------------------------------------
+# Model structure and programs that are needed
+REQUIRE_DIRS="WORK SCRI DATA SRC"
+REQUIRE_ITEMS="../main.bash pargen ../mandtg ../util_tools.bash write_makefile.bash define_makefile.bash"
+
+
+# --------------------------------------------------------------
+# TESTING
+# --------------------------------------------------------------
+# Vital executables that must exist
+for item in $REQUIRE_ITEMS; do
+    VITAL_EXECS="$VITAL_EXECS scripts/$MODEL/$item"
+done
+
+# Vital variables that must exist
+VITAL_VARS="$VITAL_VARS EXPL EXPS SDATE EDATE DSTEP RES LEV FCL ENS NNODES"
+
+ 
+# --------------------------------------------------------------
+# MODEL OUTPUT
+# --------------------------------------------------------------

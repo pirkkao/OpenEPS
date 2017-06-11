@@ -2,12 +2,25 @@
 #
 # EXPERIMENT SPECIFIC SETTINGS
 #
+# test2 - EPS2
+#
+# Example settings for an ensemble run with initial state linking
+# from a local repository. Same initial state used for all ens
+# members, ens spread generated through enabling SPPT model error
+# repsentation. After each model integration a simple cdo collection
+# task of a few meteorological fields is executed (hence the need for
+# cdo to run this example). After all ensemble members have finished
+# another cdo task is executed to calculate the mean and stdev of
+# the ensemble.
+#
+# For OpenIFS version CY40R1
+#
 
 # --------------------------------------------------------------
 # GENERAL
 # --------------------------------------------------------------
 # Basics
-EXPL="testiEPS10"  # Long exp name
+EXPL="EPS2"  # Long exp name
 EXPS="teps"       # 4 letter exp name
 SDATE=2013110212  # Exp start date
 EDATE=2013110212  # Exp end   date
@@ -21,13 +34,6 @@ FCLEN=12
 
 # Ensemble size (CTRL is always member 0, so real size is ENS+1)
 ENS=3
-
-# Stochastic physics
-LSPPT="false"
-LSKEB="false" # "true" does not work with cy38r1
-
-# Parameter estimation
-LPAR="true"
 
 # Resources
 # (number of nodes, number of cores per model,
@@ -43,31 +49,39 @@ OIFSv=40r1v1
 # Model bin
 MODEL_EXE=$HOME/projects/OIFS/oifs${OIFSv}/make/gnu-opt/oifs/bin/master.exe
 
+
+
 # --------------------------------------------------------------
 # REQUIRED DIRS AND SCRIPTS
 # --------------------------------------------------------------
 # Model structure and programs that are needed
-REQUIRE_DIRS="WORK SCRI DATA SRC"
-REQUIRE_ITEMS="../main.bash par_gen.bash par_set.bash link.bash run.bash funceval ../mandtg ../util_tools.bash write_makefile.bash define_makefile.bash ppro.bash ppro_ens.bash"
+REQUIRE_DIRS="WORK SCRI DATA SRC BIN"
+REQUIRE_ITEMS="main.bash link.bash run.bash mandtg util_tools.bash write_makefile.bash define_makefile.bash ppro.bash ppro_ens.bash"
 REQUIRE_NAMEL="namelist_${OIFSv}_general.bash namelist_${OIFSv}_t$RES.bash"
+
 
 
 # --------------------------------------------------------------
 # TESTING
 # --------------------------------------------------------------
 # Vital executables that must exist
-for item in $REQUIRE_ITEMS; do
-    VITAL_EXECS="$VITAL_EXECS scripts/$MODEL/$item"
-done
-for item in $REQUIRE_NAMEL; do
-    VITAL_EXECS="$VITAL_EXECS scripts/$MODEL/$item"
-done
-VITAL_EXECS="$VITAL_EXECS MODEL_EXE"
+REQUIRE_PATHS="$REQUIRE_PATHS MODEL_EXE cdo mpirun"
 
 # Vital variables that must exist
-VITAL_VARS="$VITAL_VARS EXPL EXPS SDATE EDATE DSTEP RES LEV FCLEN ENS NNODES"
+REQUIRE_VARS="$REQUIRE_VARS EXPL EXPS SDATE EDATE DSTEP RES LEV FCLEN ENS NNODES"
 
- 
+
+
+# --------------------------------------------------------------
+# MODEL RUN OPTIONS
+# --------------------------------------------------------------
+
+# Stochastic physics
+LSPPT="true"
+LSKEB="false" # "true" does not work with cy38r1
+
+
+
 # --------------------------------------------------------------
 # MODEL OUTPUT
 # --------------------------------------------------------------
@@ -85,13 +99,14 @@ LEVSM="-99"
 
 # Pressure level variables and pressure levels (in Pa)
 VARSP="129 130"
-LEVSP="50000. 92500."
+LEVSP="50000.0 92500.0"
 
 # Surface level dynamic variables
 VARSS="129 152"
 
 # Surface variables
 VARPP="151 165 176 177 208"
+
 
 
 # --------------------------------------------------------------

@@ -8,14 +8,14 @@
 
 # Run options
 #
-export NAME=test3
+export NAME=parameter_estimation
 export MODEL=oifs
-export HOST=$(hostname | cut -c 1-5)
+export HOST=ollin
 
 # Import correct settings
 #
-source configs/${MODEL}/exp.$NAME # Experiment specific settings
-source configs/${MODEL}/env.$HOST # Environment specific settings
+source examples/${MODEL}/configs/exp.$NAME # Experiment specific settings
+source examples/${MODEL}/configs/env.$HOST # Environment specific settings
 
 # Broadcast general
 #
@@ -25,18 +25,18 @@ printf '\n%s\n\n' "Start date for ensemble is $SDATE and end date $EDATE"
 
 # Check that all vital paths/executables exist
 #
-source scripts/util_test.bash
+source bin/util_test.bash
 
 # Initialize
 #
-source scripts/util_init.bash
+source bin/util_init.bash
 
 # Launch bash/batch job
 #
 cd $WORK
 printf "\n3) Submitting job...\n"
 #sbatch scripts/job.bash 
-bash scripts/main.bash &
+bash main.bash &
 printf "   ...done! Launcher exiting...\n\n"
 
 exit 1

@@ -3,7 +3,7 @@
 date=${1:-""}
 nextdate="../$ndate/"
 
-source $SCRI/util_tools.bash
+source $WORK/util_tools.bash
 
 # KEEP ALL FILES
 printf "%s\n"    ".SECONDARY :"

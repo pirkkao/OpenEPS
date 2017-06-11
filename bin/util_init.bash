@@ -18,26 +18,51 @@ done
 
 # Copy scripts
 #
-for item in $REQUIRE_ITEMS; do
- cp -f scripts/$MODEL/$item $SCRI/.
+for item in $REQUIRE_ITEMS $REQUIRE_NAMEL; do
+    if [ -f   examples/$MODEL/scripts/$item ]; then
+	cp -f examples/$MODEL/scripts/$item $SCRI/.
+    elif [ -f bin/$item ]; then
+	cp -f bin/$item $WORK/.
+    else
+	printf '\n%s\n' "Aborting, $item not found..."
+	exit 1
+    fi
 done
 
-# Copy sources
+# Copy configs
 #
-for item in ${MODEL}/exp.$NAME ${MODEL}/env.$HOST; do
-    cp -f configs/$item $SRC/.
+for item in exp.$NAME env.$HOST; do
+    cp -f examples/$MODEL/configs/$item $SRC/.
 done
+
+# Generate ENS structure within DATA, i.e. a folder for each ens member
+#
+for i in $(seq 0 $ENS); do
+    # Add leading zeros
+    i=$(printf "%03d" $i)
+    mkdir -p  $DATA/$SDATE/pert$i
+    echo >    $DATA/$SDATE/pert$i/infile_new
+done
+
+# Initialize parameter estimation if TRUE
+#
+if [ ! -z $LPAR ]; then
+    if [ $LPAR == "true" ]; then
+	. $SCRI/par_gen.bash $SDATE
+    fi
+fi
 
 
 # --------------------------------------------------------------
 # RESOURCE ALLOCATION
 # --------------------------------------------------------------
-source scripts/util_resource_alloc.bash
+source bin/util_resource_alloc.bash
 
 printf "   *************************************************************\n"
 printf "   OpenEPS will reserve $totncpus cores on $NNODES node(s) for $reservation minutes!\n"
 printf "   $parallels parallel models will be run, each on $CPUSPERMODEL core(s)\n"
 printf "   *************************************************************\n"
+
 
 
 #--------------------------------------------------------------
@@ -46,9 +71,11 @@ printf "   *************************************************************\n"
 # If sending the job as bulk, modify job.bash
 #
 if [ ! -z $SEND_AS_SINGLEJOB ] || [ ! -z $SEND_AS_MULTIJOB] ; then
-    . scripts/util_batchjob.bash
+    . bin/util_batchjob.bash
 fi
-	
+
+
+
 #--------------------------------------------------------------
 # MODIFY RUN NAMELIST
 #--------------------------------------------------------------
@@ -57,7 +84,8 @@ fi
 #
 for imem in $(seq 0 $ENS); do
     for item in $REQUIRE_NAMEL; do
-	. scripts/$MODEL/$item
+	#. scripts/$MODEL/$item
+	. $SCRI/$item
     done
 done
 
@@ -81,5 +109,24 @@ done
 #sed -i -e "s/lon=768/lon=$lon/g" $SCRI/testi.f90
 #sed -i -e "s/lat=384/lat=$lat/g" $SCRI/testi.f90
 #sed -i -e "s/lev=21/lev=$LEV/g"  $SCRI/testi.f90
+
+
+
+#--------------------------------------------------------------
+# GENERATE ALL MAKEFILES
+#--------------------------------------------------------------
+export cdate ndate
+cdate=$SDATE
+while [ $cdate -le $EDATE ]; do
+    # Define next date
+    ndate=`exec $WORK/./mandtg $cdate + $DSTEP`
+    
+    # Generate makefile for current date
+    . ${SCRI}/define_makefile.bash
+    . ${SCRI}/write_makefile.bash  > $DATA/$cdate/makefile_$cdate
+    
+    cdate=$ndate
+done
+
 
 printf "   ...done!\n\n"

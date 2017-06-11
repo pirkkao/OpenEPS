@@ -9,29 +9,12 @@
 # command of the line does not return zero.
 #
 set -e
-printf "\n\n4) Now in job.bash\n"
+printf "\n\n4) Now in main.bash\n"
 
 
 # Set program source, work directories and available resources
 #
 for f in configs/*; do source $f; done
-
-
-# Generate ENS structure within DATA, i.e. a folder for each ens member
-#
-for i in $(seq 0 $ENS); do
-    # Add leading zeros
-    i=$(printf "%03d" $i)
-    mkdir -p  $DATA/$SDATE/pert$i
-    echo >    $DATA/$SDATE/pert$i/infile_new
-done
-
-# Parameter estimation
-if [ ! -z $LPAR ]; then
-    if [ $LPAR == "true" ]; then
-	. $SCRI/par_gen.bash $SDATE
-    fi
-fi
 
 
 # Loop over dates
@@ -48,11 +31,11 @@ while [ $cdate -le $EDATE ]; do
     echo "   Processing date $cdate"
     
     # Define next date
-    ndate=`exec $SCRI/./mandtg $cdate + $DSTEP`
+    ndate=`exec $WORK/./mandtg $cdate + $DSTEP`
     
     # Generate makefile for current date
-    . ${SCRI}/define_makefile.bash
-    . ${SCRI}/write_makefile.bash  > makefile_$cdate
+    #. ${SCRI}/define_makefile.bash
+    #. ${SCRI}/write_makefile.bash  > makefile_$cdate
     
     #make -f $makefile -j $njobs
     make -f makefile_$cdate -j $PARALLELS_IN_NODE
