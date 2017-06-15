@@ -7,7 +7,11 @@
 dates=1
 date=$SDATE
 while [ $date -lt $EDATE ]; do
-    date=$(exec scripts/mandtg $date + $DSTEP)
+    if [ -e $WORK/mandtg ]; then
+	date=$(exec $WORK/mandtg $date + $DSTEP)
+    else
+	date=$(($date + $DSTEP))
+    fi
     ((dates+=1))
 done
 

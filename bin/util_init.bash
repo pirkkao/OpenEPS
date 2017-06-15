@@ -35,22 +35,6 @@ for item in exp.$NAME env.$HOST; do
     cp -f examples/$MODEL/configs/$item $SRC/.
 done
 
-# Generate ENS structure within DATA, i.e. a folder for each ens member
-#
-for i in $(seq 0 $ENS); do
-    # Add leading zeros
-    i=$(printf "%03d" $i)
-    mkdir -p  $DATA/$SDATE/pert$i
-    echo >    $DATA/$SDATE/pert$i/infile_new
-done
-
-# Initialize parameter estimation if TRUE
-#
-if [ ! -z $LPAR ]; then
-    if [ $LPAR == "true" ]; then
-	. $SCRI/par_gen.bash $SDATE
-    fi
-fi
 
 
 # --------------------------------------------------------------
@@ -90,6 +74,46 @@ for imem in $(seq 0 $ENS); do
 done
 
 
+
+#--------------------------------------------------------------
+# Generate sub-directories, input files and Makefiles for each individual
+# step
+#--------------------------------------------------------------
+export cdate ndate
+cdate=$SDATE
+while [ $cdate -le $EDATE ]; do
+    
+    for imem in $(seq 0 $ENS); do
+	# Add leading zeros
+	imem=$(printf "%03d" $imem)
+	mkdir -p  $DATA/${DATE_DIR}$cdate/pert$imem
+	#echo >    $DATA/$cdate/pert$imem/infile_new
+    done
+
+    # Define next date
+    if [ -e $WORK/mandtg ]; then
+	ndate=`exec $WORK/./mandtg $cdate + $DSTEP`
+    else
+	ndate=${DATE_DIR}$(($cdate + $DSTEP))
+    fi
+    
+    # Generate makefile for current date
+    #. ${SCRI}/define_makefile.bash
+    #. ${SCRI}/write_makefile.bash  > $DATA/$cdate/makefile_$cdate
+    . $SCRI/define_makefile  > $DATA/$cdate/makefile_$cdate
+    
+    cdate=$ndate
+done
+
+
+# Initialize parameter estimation if TRUE
+#
+if [ ! -z $LPAR ]; then
+    if [ $LPAR == "true" ]; then
+	. $SCRI/par_gen.bash $SDATE
+    fi
+fi
+
 #--------------------------------------------------------------
 # MODIFY POST-PROCESSING
 #--------------------------------------------------------------
@@ -110,23 +134,6 @@ done
 #sed -i -e "s/lat=384/lat=$lat/g" $SCRI/testi.f90
 #sed -i -e "s/lev=21/lev=$LEV/g"  $SCRI/testi.f90
 
-
-
-#--------------------------------------------------------------
-# GENERATE ALL MAKEFILES
-#--------------------------------------------------------------
-export cdate ndate
-cdate=$SDATE
-while [ $cdate -le $EDATE ]; do
-    # Define next date
-    ndate=`exec $WORK/./mandtg $cdate + $DSTEP`
-    
-    # Generate makefile for current date
-    . ${SCRI}/define_makefile.bash
-    . ${SCRI}/write_makefile.bash  > $DATA/$cdate/makefile_$cdate
-    
-    cdate=$ndate
-done
 
 
 printf "   ...done!\n\n"
