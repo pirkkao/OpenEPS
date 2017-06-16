@@ -23,6 +23,8 @@ for item in $REQUIRE_ITEMS $REQUIRE_NAMEL; do
 	cp -f examples/$MODEL/scripts/$item $SCRI/.
     elif [ -f bin/$item ]; then
 	cp -f bin/$item $WORK/.
+    elif [ ! -z ${!item} ] && [ -f ${!item} ] ; then
+	cp -f ${!item} $WORK/.
     else
 	printf '\n%s\n' "Aborting, $item not found..."
 	exit 1
@@ -81,37 +83,51 @@ done
 #--------------------------------------------------------------
 export cdate ndate
 cdate=$SDATE
+
+# Set default subfolder to be "pertXXX"
+if [ -z $SUBDIR_NAME ]; then
+    SUBDIR_NAME=pert
+fi
+    
 while [ $cdate -le $EDATE ]; do
     
     for imem in $(seq 0 $ENS); do
 	# Add leading zeros
 	imem=$(printf "%03d" $imem)
-	mkdir -p  $DATA/${DATE_DIR}$cdate/pert$imem
+	mkdir -p  $DATA/${DATE_DIR}$cdate/$SUBDIR_NAME$imem
 	#echo >    $DATA/$cdate/pert$imem/infile_new
     done
+
+    if [ ! -z $LPAR ] && [ $LPAR == "true" ]; then
+	mkdir -p $EPPES/${DATE_DIR}$cdate
+    fi
 
     # Define next date
     if [ -e $WORK/mandtg ]; then
 	ndate=`exec $WORK/./mandtg $cdate + $DSTEP`
     else
-	ndate=${DATE_DIR}$(($cdate + $DSTEP))
+	ndate=$(( $cdate + $DSTEP ))
     fi
     
     # Generate makefile for current date
-    #. ${SCRI}/define_makefile.bash
-    #. ${SCRI}/write_makefile.bash  > $DATA/$cdate/makefile_$cdate
-    . $SCRI/define_makefile  > $DATA/$cdate/makefile_$cdate
+    if [ $MODEL != lorenz95 ]; then
+	. $SCRI/define_makefile  > $DATA/${DATE_DIR}$cdate/makefile_$cdate
+    fi
     
     cdate=$ndate
 done
 
+if [ $MODEL == lorenz95 ]; then
+    pushd $DATA > /dev/null
+    cp ${DEFDIR}/eppes_init/*.dat eppes/day0
+    . $SCRI/define_makefile
+    popd > /dev/null
+fi
 
 # Initialize parameter estimation if TRUE
 #
-if [ ! -z $LPAR ]; then
-    if [ $LPAR == "true" ]; then
+if [ ! -z $LPAR ] && [ $LPAR == "true" ] && [ -f $SCRI/par_gen.bash ]; then
 	. $SCRI/par_gen.bash $SDATE
-    fi
 fi
 
 #--------------------------------------------------------------

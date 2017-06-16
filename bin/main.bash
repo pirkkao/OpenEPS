@@ -22,26 +22,31 @@ for f in configs/*; do source $f; done
 export cdate ndate
 cdate=$SDATE
 
-while [ $cdate -le $EDATE ]; do
-    cd $DATA/$cdate
-    # Log
-    echo                                >> $WORK/master.log
-    echo "Running ens for $cdate"       >> $WORK/master.log
-    date | echo `exec cut -b13-21` init >> $WORK/master.log
-    echo "   Processing date $cdate"
+if [ ! -e $DATA/Makefile ]; then
+    while [ $cdate -le $EDATE ]; do
+	cd $DATA/$cdate
+	# Log
+	echo                                >> $WORK/master.log
+	echo "Running ens for $cdate"       >> $WORK/master.log
+	date | echo `exec cut -b13-21` init >> $WORK/master.log
+	echo "   Processing date $cdate"
+	
+	# Define next date
+	ndate=`exec $WORK/./mandtg $cdate + $DSTEP`
     
-    # Define next date
-    ndate=`exec $WORK/./mandtg $cdate + $DSTEP`
+	# Generate makefile for current date
+	#. ${SCRI}/define_makefile.bash
+	#. ${SCRI}/write_makefile.bash  > makefile_$cdate
     
-    # Generate makefile for current date
-    #. ${SCRI}/define_makefile.bash
-    #. ${SCRI}/write_makefile.bash  > makefile_$cdate
+	#make -f $makefile -j $njobs
+	make -f makefile_$cdate -j $PARALLELS_IN_NODE
     
-    #make -f $makefile -j $njobs
-    make -f makefile_$cdate -j $PARALLELS_IN_NODE
-    
-    cdate=$ndate
-done
+	cdate=$ndate
+    done
+else
+    cd $DATA
+    make -j $PARALLELS_IN_NODE
+fi
     
 set +e
 

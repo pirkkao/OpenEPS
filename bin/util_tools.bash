@@ -139,3 +139,78 @@ write_makefile () {
 	echo
     done
 }
+
+# emember_makefile writes the Makefile corresponding to a single eppes run
+#
+# NOTE: This sub-makefile becomes part of the main Makefile at the RUNDIR root.
+#       The current directory context 'CURDIR', in which Make interprets this
+#       sub-makefile is 'RUNDIR', not the sub-directory in which this
+#       sub-makefile is, 'RUNDIR/*'.
+
+emember_makefile () {
+    local currdir="day${1}/emember${2}"
+    local prevdir="day$(( $1 - 1 ))/eppes"
+    local ctrldir="day${1}/ctrl"
+    cat > "${currdir}/Makefile" <<EOF
+
+${currdir}/scores_pert.dat : ${SCORES_FUN} ${L95_DATA} ${currdir}/l95out.dat ${L95_TIME} 
+	cd ${currdir}; python ${SCORES_FUN} ${L95_DATA} ${RUNDIR}/${currdir}/l95out.dat ${L95_TIME} $((${T_DAY}+${T_OUT}*(${1}-1) ))
+
+${currdir}/l95out.dat : ${L95_NML} ${currdir}/gupars.dat ${currdir}/s0file.dat ${L95_EXE}
+	cd ${currdir}; ${L95_EXE} ${L95_NML}
+
+${currdir}/gupars.dat : ${prevdir}/sampleout.dat
+	sed -n '${2}p' \$< > \$@
+
+${currdir}/s0file.dat : ${ctrldir}/s0file.dat ${SET_PERT_VAL}
+	cd ${currdir} ; python ${SET_PERT_VAL} ${RUNDIR}/${ctrldir}/s0file.dat ${S0_SIGMA}
+
+EOF
+
+}
+
+
+# eppes_makefile
+#
+# NOTE: The same as previous...
+
+eppes_makefile () {
+    local currdir="eppes/day${1}"
+    local prevdir="eppes/day$(( $1 - 1 ))"
+    local ctrldir="day${1}/emember000"
+    local from_prev_day=(
+        bounds.dat mufile.dat nfile.dat sigfile.dat wfile.dat)
+    local cdirs=($(ls -w 0 -vd day${1}/emember*))
+    cat > "${currdir}/Makefile" <<EOF
+
+${currdir}/oldsample.dat : ${currdir}/sampleout.dat
+	cp ${currdir}/sampleout.dat ${currdir}/oldsample.dat
+
+${currdir}/sampleout.dat : ${EPPES_RUN} ${from_prev_day[@]/#/${currdir}/} ${currdir}/scores.dat ${prevdir}/oldsample.dat ${EPPES_EXE}
+	cp ${prevdir}/oldsample.dat ${currdir}
+	cd ${currdir}; ${EPPES_EXE} ${EPPES_RUN}
+
+${from_prev_day[@]/#/${currdir}/} : ${from_prev_day[@]/#/${prevdir}/} ${prevdir}/oldsample.dat
+	cp ${from_prev_day[@]/#/${prevdir}/} ${currdir}/
+
+${currdir}/scores.dat : ${cdirs[@]/%//scores_pert.dat}
+	cat ${cdirs[@]/%//scores_pert.dat} > \$@
+
+${ctrldir}/s0file.dat : ${L95_DATA} ${OBS_ERROR}
+	cd ${ctrldir} ; python ${OBS_ERROR} \$< ${1} ${AN_SIGMA}
+
+EOF
+}
+
+eppes_init_makefile () {
+
+cat > "eppes/day0/Makefile" <<EOF
+
+eppes/day0/oldsample.dat : eppes/day0/sampleout.dat
+	cp eppes/day0/sampleout.dat eppes/day0/oldsample.dat
+
+eppes/day0/sampleout.dat : \$(addprefix eppes/day0/,bounds.dat mufile.dat nfile.dat sigfile.dat wfile.dat) ${EPPES_INIT} ${EPPES_EXE}
+	cd eppes/day0; ${EPPES_EXE} ${EPPES_INIT}
+
+EOF
+}

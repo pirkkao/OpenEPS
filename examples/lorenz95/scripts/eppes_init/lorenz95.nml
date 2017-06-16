@@ -1,0 +1,16 @@
+!!
+!! Lorenz95 configuration file, forecast model
+!!
+&lorenz95pars
+ K = 40   ! n:o of slow states (40)
+ J = 0    ! n:o of fast states (0, or 8)
+ F = 10.0  ! forcing
+ dt = 0.0025 ! solver time step
+ dout = 0.4  ! output time step (0 means one step)
+ t0 = 0.0 ! integration start, OBS this can also be given as command line arg
+ t1 = 1.2 ! 0.1, integration end
+ guparfile = 'gupars.dat' ! feed parametrization
+ etaparfile = ''          ! stochastic parametrization
+ s0file = 's0file.dat'  ! initial states
+ s0sigma = 0      ! inital value perturbation, set to 0 because it is done beforehand in script)
+/

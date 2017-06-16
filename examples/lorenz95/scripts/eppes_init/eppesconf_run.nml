@@ -1,0 +1,15 @@
+!!
+!! EPPES configuration file for run
+!!
+&eppesconf
+ sampleonly = 0
+ nsample    = 50
+ mufile    = 'mufile.dat'
+ sigfile   = 'sigfile.dat'
+ wfile     = 'wfile.dat'
+ nfile     = 'nfile.dat'
+ samplein  = 'oldsample.dat'
+ sampleout = 'sampleout.dat'
+ scorefile = 'scores.dat'
+ boundsfile = 'bounds.dat'
+/

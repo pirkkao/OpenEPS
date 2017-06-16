@@ -9,7 +9,7 @@
 # Run options
 #
 export NAME=test
-export MODEL=oifs
+export MODEL=lorenz95
 export HOST=ollin
 
 # Import correct settings
@@ -33,7 +33,7 @@ source bin/util_init.bash
 
 # Launch bash/batch job
 #
-
+exit
 cd $WORK
 printf "\n3) Submitting job...\n"
 #sbatch scripts/job.bash 

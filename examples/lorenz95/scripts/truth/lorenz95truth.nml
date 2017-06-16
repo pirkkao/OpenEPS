@@ -1,0 +1,17 @@
+!!
+!! Lorenz95 configuration file, the truth run
+!! T10
+!!
+&lorenz95pars
+ K = 40   ! n:o of slow states (40)
+ J = 8    ! n:o of fast states (0, or 8)
+ F = 10.0  ! forcing
+ b = 10.0 ! forecast model parameters
+ c = 10.0 !
+ h = 1.0  !
+ Fy = 8.0 !
+ dt = 0.0025 ! solver time step
+ guparfile = '' ! feed parametrization
+ etaparfile = ''          ! stochastic parametrization
+ s0file = 'l95s0.dat'     ! l95s0.dat initial states
+/
