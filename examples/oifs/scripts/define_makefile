@@ -25,10 +25,11 @@ if [ ! -z $LPAR ] && [ $LPAR == "true" ]; then
     target_6="parfile"
     prereq_6=""
     recipe_6=(
-	"cd \$(dir \$@) ; \ 
+	"cd \$(dir \$@) ; \
          $serial ${SCRI}/par_set.bash"
     )
-    recipe_1="$serial ${SCRI}/par_gen.bash $ndate"
+    recipe_1="$serial ${SCRI}/par_gen.bash $ndate ; "
+    applyto_6=individual
 fi
 
 target_5="infile"
@@ -72,7 +73,7 @@ applyto_2=individual
 target_1="MAIN/date_finished"
 prereq_1="ppfile ../$ndate/DIR/infile"
 recipe_1=(
-    "$serial ${SCRI}/ppro_ens.bash \"$NPPRO\" ; \
+    "$serial ${SCRI}/ppro_ens.bash \"$NPPRO\" ; $recipe_1 \
      echo > date_finished"
 )
 applyto_1=main_all

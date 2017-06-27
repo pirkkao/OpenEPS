@@ -1,12 +1,17 @@
 #!/bin/bash
 
 date=${1}
+sampleonly=${2:-false}
 
 # Log
 echo `date +%H:%M:%S` pargener "ens   " >> $WORK/master.log
 
 # Parameter perturbations
 #
+# Sample only, no distribution update
+if [ $sampleonly != false ]; then
+    echo "do stuff" > /dev/null
+fi
 
 # Set up an awk function for real number calculations
 rcalc() { awk "BEGIN{print $*}"; }

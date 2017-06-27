@@ -99,7 +99,7 @@ while [ $cdate -le $EDATE ]; do
     done
 
     if [ ! -z $LPAR ] && [ $LPAR == "true" ]; then
-	mkdir -p $EPPES/${DATE_DIR}$cdate
+	mkdir -p $DATA/eppes/${DATE_DIR}$cdate
     fi
 
     # Define next date
@@ -127,7 +127,7 @@ fi
 # Initialize parameter estimation if TRUE
 #
 if [ ! -z $LPAR ] && [ $LPAR == "true" ] && [ -f $SCRI/par_gen.bash ]; then
-	. $SCRI/par_gen.bash $SDATE
+	. $SCRI/par_gen.bash $SDATE sampleonly
 fi
 
 #--------------------------------------------------------------
