@@ -78,8 +78,8 @@ done
 
 
 #--------------------------------------------------------------
-# Generate sub-directories, input files and Makefiles for each individual
-# step
+# Generate sub-directories, input files and Makefiles for each
+# individual step
 #--------------------------------------------------------------
 export cdate ndate
 cdate=$SDATE
@@ -126,8 +126,8 @@ fi
 
 # Initialize parameter estimation if TRUE
 #
-if [ ! -z $LPAR ] && [ $LPAR == "true" ] && [ -f $SCRI/par_gen.bash ]; then
-	. $SCRI/par_gen.bash $SDATE sampleonly
+if [ ! -z $LPAR ] && [ $LPAR == "true" ] && [ -f $SCRI/par_init.bash ]; then
+    . $SCRI/par_init.bash $SDATE
 fi
 
 #--------------------------------------------------------------

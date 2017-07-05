@@ -8,7 +8,7 @@
 
 # Run options
 #
-export NAME=test
+export NAME=test3
 export MODEL=oifs
 export HOST=ollin
 

@@ -47,6 +47,9 @@ OIFSv=38r1v04
 # Model bin
 MODEL_EXE=$HOME/projects/OIFS/oifs${OIFSv}/make/gnu-opt/oifs/bin/master.exe
 
+# EPPES bin
+EPPES_EXE=$HOME/playground/eppes/eppes_routine
+
 
 
 # --------------------------------------------------------------
@@ -55,7 +58,7 @@ MODEL_EXE=$HOME/projects/OIFS/oifs${OIFSv}/make/gnu-opt/oifs/bin/master.exe
 # Model structure and programs that are needed
 REQUIRE_DIRS="WORK SCRI DATA SRC BIN"
 REQUIRE_ITEMS="main.bash link.bash run.bash mandtg util_tools.bash define_makefile ppro.bash ppro_ens.bash \
-par_gen.bash par_set.bash"
+par_gen.bash par_set.bash par_init.bash"
 REQUIRE_NAMEL="namelist_${OIFSv}_general.bash namelist_${OIFSv}_t$RES.bash"
 
 
@@ -64,7 +67,7 @@ REQUIRE_NAMEL="namelist_${OIFSv}_general.bash namelist_${OIFSv}_t$RES.bash"
 # TESTING
 # --------------------------------------------------------------
 # Vital executables that must exist
-REQUIRE_PATHS="$REQUIRE_PATHS MODEL_EXE cdo mpirun"
+REQUIRE_PATHS="$REQUIRE_PATHS MODEL_EXE EPPES_EXE cdo mpirun"
 
 # Vital variables that must exist
 REQUIRE_VARS="$REQUIRE_VARS EXPL EXPS SDATE EDATE DSTEP RES LEV FCLEN ENS NNODES"
