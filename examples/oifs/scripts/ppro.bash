@@ -6,10 +6,10 @@
 steps=${1:-"0000"}
 
 # Get process id
-nid=$(pwd | grep -o -P 'pert.{0,5}' | sed -e 's/pert//g')
+nid=$(pwd | grep -o -P "$SUBDIR_NAME.{0,5}" | sed -e "s/$SUBDIR_NAME//g")
 
 # Log
-echo `date +%H:%M:%S` post-pro pert${nid} >> $WORK/master.log
+echo `date +%H:%M:%S` post-pro $SUBDIR_NAME${nid} >> $WORK/master.log
 
 for step in $steps; do
     # Select pressure level variables t and z

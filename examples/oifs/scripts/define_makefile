@@ -23,17 +23,19 @@
 
 source $WORK/util_tools.bash
 
-pert_struct=pert
+pert_struct=$SUBDIR_NAME
 
 if [ ! -z $LPAR ] && [ $LPAR == "true" ]; then
     target_6="parfile"
-    prereq_6=""
+    prereq_6="infile"
     recipe_6=(
 	"cd \$(dir \$@) ; \
          $serial ${SCRI}/par_set.bash"
     )
     recipe_1="$serial ${SCRI}/par_gen.bash $cdate ; "
     applyto_6=individual
+else
+    recipe_1=""
 fi
 
 target_5="infile"
@@ -52,7 +54,7 @@ fi
 recipe_4=(
     "cd \$(dir \$@) ; \
      $serial ${SCRI}/run.bash ;\
-     $parallel $MODEL_EXE -e $EXPS ; \
+     $parallel $MODEL_EXE -v ecmwf -e $EXPS ; \
      $serial ${SCRI}/run.bash finish"
 )
 applyto_4=individual

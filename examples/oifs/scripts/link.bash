@@ -4,20 +4,20 @@
 date=${1:-$cdate}
 
 # Get process id
-nid=$(pwd | grep -o -P 'pert.{0,5}' | sed -e 's/pert//g')
+nid=$(pwd | grep -o -P "$SUBDIR_NAME.{0,5}" | sed -e "s/$SUBDIR_NAME//g")
 
 # Log
-echo `date +%H:%M:%S` link "   " pert${nid} >> $WORK/master.log
+echo `date +%H:%M:%S` link "   " $SUBDIR_NAME${nid} >> $WORK/master.log
 
 # pert000 is ctrl
 if [ $nid -eq 0 ]; then
     name=ctrl
 else
-    name=pert$nid
+    name=$SUBDIR_NAME$nid
 fi
 
-# Link namelist
-ln -sf $SCRI/namelist.$name fort.4
+# Copy namelist
+cp -f $SCRI/namelist.$name fort.4
 
 # All initial states link to control until the states can be generated
 name=ctrl

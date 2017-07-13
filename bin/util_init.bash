@@ -6,15 +6,39 @@
 #
 set -e
 printf "\n2) Initializing ${MODEL} ensemble $EXPL...\n"
+if [ $VERBOSE -eq 1 ]; then
+    verbose=true
+else
+    verbose=false
+fi
+printf "   Verbose = $verbose\n"
+printf "   Restart = $RESTART\n"
+
 
 
 # --------------------------------------------------------------
-# INITIALIZE STRUCTURE
+# (RE)INITIALIZE STRUCTURE
 # --------------------------------------------------------------
+# Remove previous structure
+#
+if [ $RESTART == "true" ]; then
+    # Just to be super safe
+    if [ "$WORK" == "/" ] || [ "$WORK" == "$HOME" ]; then
+	echo "Check WORK directory path..."
+	exit
+    fi
+    # Also only remove $WORK/data
+    test ! -d $WORK/data | rm -rf $WORK/data
+    rm -f $WORK/master.log
+fi
+
+
 # Make dirs
+#
 for item in $REQUIRE_DIRS; do
     test -d ${!item} || mkdir -p ${!item}
 done
+
 
 # Copy scripts
 #
@@ -31,12 +55,19 @@ for item in $REQUIRE_ITEMS $REQUIRE_NAMEL; do
     fi
 done
 
+
 # Copy configs
 #
 for item in exp.$NAME env.$HOST; do
     cp -f examples/$MODEL/configs/$item $SRC/.
 done
 
+
+# Set default subfolder to be "pertXXX"
+if [ -z $SUBDIR_NAME ]; then
+    SUBDIR_NAME=pert
+fi
+export SUBDIR_NAME
 
 
 # --------------------------------------------------------------
@@ -51,9 +82,9 @@ printf "   *************************************************************\n"
 
 
 
-#--------------------------------------------------------------
+# --------------------------------------------------------------
 # BATCH JOB SETTINGS
-#--------------------------------------------------------------
+# --------------------------------------------------------------
 # If sending the job as bulk, modify job.bash
 #
 if [ ! -z $SEND_AS_SINGLEJOB ] || [ ! -z $SEND_AS_MULTIJOB] ; then
@@ -62,32 +93,28 @@ fi
 
 
 
-#--------------------------------------------------------------
+# --------------------------------------------------------------
 # MODIFY RUN NAMELIST
-#--------------------------------------------------------------
+# --------------------------------------------------------------
 # Modify number of cores, timestepping, select output variables,
 # identify ens members, set stochastic physics, etc.
 #
 for imem in $(seq 0 $ENS); do
     for item in $REQUIRE_NAMEL; do
-	#. scripts/$MODEL/$item
 	. $SCRI/$item
     done
 done
 
 
 
-#--------------------------------------------------------------
+# --------------------------------------------------------------
+# GENERATE SUB-STRUCTURE
+# --------------------------------------------------------------
 # Generate sub-directories, input files and Makefiles for each
 # individual step
-#--------------------------------------------------------------
+#
 export cdate ndate
 cdate=$SDATE
-
-# Set default subfolder to be "pertXXX"
-if [ -z $SUBDIR_NAME ]; then
-    SUBDIR_NAME=pert
-fi
     
 while [ $cdate -le $EDATE ]; do
     
@@ -95,14 +122,9 @@ while [ $cdate -le $EDATE ]; do
 	# Add leading zeros
 	imem=$(printf "%03d" $imem)
 	mkdir -p  $DATA/${DATE_DIR}$cdate/$SUBDIR_NAME$imem
-	#echo >    $DATA/$cdate/pert$imem/infile_new
     done
 
-    if [ ! -z $LPAR ] && [ $LPAR == "true" ]; then
-	mkdir -p $DATA/eppes/${DATE_DIR}$cdate
-    fi
-
-    # Define next date
+    # Define next date here so it can be used in makefile writing
     if [ -e $WORK/mandtg ]; then
 	ndate=`exec $WORK/./mandtg $cdate + $DSTEP`
     else
@@ -124,15 +146,42 @@ if [ $MODEL == lorenz95 ]; then
     popd > /dev/null
 fi
 
-# Initialize parameter estimation if TRUE
-#
-if [ ! -z $LPAR ] && [ $LPAR == "true" ] && [ -f $SCRI/par_init.bash ]; then
-    . $SCRI/par_init.bash $SDATE
+
+
+# --------------------------------------------------------------
+# INITIALIZE PARAMETER ESTIMATION IF TRUE
+# --------------------------------------------------------------
+if [ ! -z $LPAR ] && [ $LPAR == "true" ]; then
+    
+    cdate=$SDATE
+    while [ $cdate -le $EDATE ]; do
+	
+	# Define next date
+	if [ -e $WORK/mandtg ]; then
+	    ndate=`exec $WORK/./mandtg $cdate + $DSTEP`
+	else
+	    ndate=$(( $cdate + $DSTEP ))
+	fi
+    
+	# Create EPPES dir structure
+	if [ ! -z $LPAR ] && [ $LPAR == "true" ]; then
+	    mkdir -p $DATA/eppes/${DATE_DIR}$cdate
+	fi
+    
+	cdate=$ndate
+    done
+
+    # Init EPPES
+    if [ -f $SCRI/par_init.bash ]; then
+	. $SCRI/par_init.bash $SDATE
+    fi
 fi
 
-#--------------------------------------------------------------
+
+
+# --------------------------------------------------------------
 # MODIFY POST-PROCESSING
-#--------------------------------------------------------------
+# --------------------------------------------------------------
 # Modify and compile fortran files
 #
 #sed -i -e "s/\:\:lon=320/\:\:lon=$lon/g"      $SCRI/calc_cost_en.f90

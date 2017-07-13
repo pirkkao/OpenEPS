@@ -1,69 +1,104 @@
 # OpenEPS (Open Ensemble Prediction System)
 
+usage : ./openEPS [Options]
+
+ Options 
+   -e, --exp     Select experiment template to run
+   -m, --model   Select model to run
+   -r, --restart Remove existing exp data folder and do a
+                 clean run
+   -v, --verbose Print stderr and stdout on konsole
+   -h, --help    This help
+   --kill        [Kill already running exp]
+
+
 This is a versatile Ensemble Prediction System that provides the
-framework for running ensembles of different applications. So far
-scripts are available for running OpenIFS and a very simple testcase.
-There is still quite much to do, and the structure will likely
-be changed until everything is clean and understandable.
+framework for running ensembles of different applications. So
+far scripts are available for running OpenIFS and a very simple
+testcase. There is still quite much to do, and the structure will
+likely be changed until everything is clean and understandable.
 So, please be patient when using!
 
-Workflow: (items in [] are TBD)
+ --------------------------------------------------------------
+  Strucure:
+ --------------------------------------------------------------
+All common utility scripts and programs can be found in bin/.
+A few example setups are available in examples/. These provide
+guidance on how to setup and utilize openEPS for running
+1) Ensembles of OpenIFS
+2) Ensembles of OpenIFS with a parameter estimation algorithm
+   (EPPES)
+
+ --------------------------------------------------------------
+  Workflow: (items in [] are TBD)
+ --------------------------------------------------------------
 ./openEPS
 1) Read in configuration files that define both system and model
    specific resources, paths, needed scripts, etc.
-   (configs/$MODEL/exp.$NAME)
-   (configs/$MODEL/env.$HOST)
+   (examples/$MODEL/configs/exp.$NAME)
+   (examples/$MODEL/configs/env.$HOST)
 
 2) Test all needed files etc. are present
-   (scripts/general_test.bash)
-   [this needs still some clean up]
+   (bin/util_test.bash)
 
 3) Initialize experiment
     - Create experiment structure (create paths, copy scripts)
     - Calculate resource allocation, i.e. how much can be run
       parallel
-   [- Modify patch job resource requirements ]
     - Adjust model namelist(s) accordingly
-    - Adjust post processing scripts  
-   (scripts/general_init.bash)  
+    - Create explicit makefiles for all dates
+    - Initialize parameter estimation
+   [- Modify patch job resource requirements ]
+   [- Adjust post processing scripts ]  
+   (bin/util_init.bash)  
 
  4) Submit batchjob, or launch a new bash shell
-    Note that this job should be written separately for each model
-    (so far OpenIFS and testcase have this)!
-    - Generate parallel structure for data [ SHOULD BE MOVED ]
-    - Generate input for first date [ SHOULD BE MOVED ]
-    - Define targets and rules for makefile [ SHOULD BE RESTUCTURED ]
-    - Loope over datelist, and for each date
-      i)  Write out an explicit makefile
-      ii) Execute the makefile
+    - Loop over datelist, and let date specific makefiles
+      handle workflow within ensemble for each date (see below)
 
-Job scheduling is handled via the makefile, the workflow within
-the makefile may depend on the application. For instance, OpenIFS
-can be run in
-"forecasts only"-mode:
-1) link initial states for each ens member
+ --------------------------------------------------------------
+  About make:
+ --------------------------------------------------------------
+Job scheduling within each given date is handled via explicitly
+written makefiles, the workflow within each makefile may depend
+on the application. For instance, in the OpenIFS examples the
+makefile run logic is the following:
+
+exp.test
+1) link initial states for each ens member, final adjustments to
+   namelists
 2) once initial states are available, run the model
-3) once model output is available, go to next date
+3) once model output is available, do some simple post-processing
+4) once all ensemble members have completed 1-3 run a common
+   post-processing script
+5) go to next date
 
-[ "EPS emulator"-mode ]
-[ "parameter estimation"-mode ]
+exp.test3
+1) link initial states for each ens member, final adjustments to
+   namelists
+2) once initial states and namelists are available, change
+   selected closure parameter values via namelists
+3) run the model
+4) once model output is available, calculate a cost function
+5) once all ensemble members have completed 1-4 execute an EPPES
+   update that will update parameter distributions, also draw
+   new parameter values for the next date
+6) go to next date
 
-ISSUES/TBD (6th June 2017):
 
-iii) There is no real initial state generation process now. Hopefully 
+ --------------------------------------------------------------
+  ISSUES/TBD (6th June 2017):
+ --------------------------------------------------------------
+ 
+i) There is no real initial state generation process now. Hopefully 
 Glenn's solution for the vertical and horizontal resolution changes are
 easy for you to implement. My idea was to do the resolution changes within
 the job to minimize the need for diskspace (remember to delete all 
 unnecessary files after a date!), this would also allow for a flexible
 system if the system is run with different resolutions.
 
-vi) Cost function calculation needs an analysis field to which it can
-compare the forecast to. The model initial (control) states can be used
-as these, but I'd suggest extracting the necessary fields out and storing
-them somewhere prior to runs so the file reading won't take so long.
-
 
 
 Pirkka Ollinaho, pirkka.ollinaho@fmi.fi
-6th June 2017
+13th July 2017
 

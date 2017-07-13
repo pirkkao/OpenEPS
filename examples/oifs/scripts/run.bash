@@ -4,15 +4,15 @@
 mode=${1:-"start"}
 
 # Get process id
-nid=$(pwd | grep -o -P 'pert.{0,5}' | sed -e 's/pert//g')
+nid=$(pwd | grep -o -P "$SUBDIR_NAME.{0,5}" | sed -e "s/$SUBDIR_NAME//g")
 
-echo `date +%H:%M:%S` runmodel pert${nid} $mode >> $WORK/master.log
+echo `date +%H:%M:%S` runmodel $SUBDIR_NAME${nid} $mode >> $WORK/master.log
 
 # pert000 is ctrl
 if [ $nid -eq 0 ]; then
     name=ctrl
 else
-    name=pert$nid
+    name=$SUBDIR_NAME$nid
 fi
 
 
@@ -23,3 +23,7 @@ if [ $SEND_AS_MULTIJOB == "true" ]; then
 fi
 fi
 
+# Print progress through /dev/null direct
+if [ $mode == finish ] && [ $VERBOSE -eq 0 ]; then
+    printf "#" > /dev/tty
+fi

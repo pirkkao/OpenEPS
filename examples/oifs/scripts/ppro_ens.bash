@@ -15,9 +15,9 @@ if [ $ENS -gt 1 ]; then
 	enslist=""
 	for imem in $(seq 1 $ENS); do
 	    imem=$(printf "%03d" $imem)
-	    enslist="$enslist pert${imem}/PP_${EXPS}+00$step "
+	    enslist="$enslist $SUBDIR_NAME${imem}/PP_${EXPS}+00$step "
 	done
-
+	
 	# Calculate ensemble mean
 	cdo -ensmean ${enslist} PP_ensmean+00$step
 	
@@ -25,6 +25,6 @@ if [ $ENS -gt 1 ]; then
 	cdo -ensstd ${enslist} PP_ensstd+00$step
 
 	# Copy the ctrl pp to date-folder
-	cp -f pert000/PP_${EXPS}+00${step} PP_ctrl+00$step
+	cp -f ${SUBDIR_NAME}000/PP_${EXPS}+00${step} PP_ctrl+00$step
     done
 fi

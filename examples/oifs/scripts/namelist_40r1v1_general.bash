@@ -122,7 +122,7 @@ else
 fi    
 
 # Add parameter value controls if TRUE
-if [ $LPAR == "true" ]; then
+if [ ! -z $LPAR ] && [ $LPAR == "true" ]; then
     NAMCUMF="
     &NAMCUMF
       ENTSHALP=2.0,

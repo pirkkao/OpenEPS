@@ -8,9 +8,47 @@
 
 # Run options
 #
-export NAME=test3
-export MODEL=oifs
-export HOST=ollin
+NAME=test3
+MODEL=oifs
+HOST=ollin
+
+# Read in command line args
+#
+export VERBOSE=0
+RESTART="false"
+
+for arg in "$@"
+do
+case $arg in
+    -e|--exp)
+	NAME="$2"
+	shift # past arguments
+	shift
+	;;
+    -m|--model)
+	MODEL="$2"
+	shift # past arguments
+	shift
+	;;
+    -r|--restart)
+	RESTART="true"
+	shift # past empty argument
+	;;
+    -v|--verbose)
+	VERBOSE=1
+	shift # past empty argument
+	;;
+    -h|--help)
+	head '-n 21' README
+	exit
+	;;
+    --kill)
+	;;
+    *)
+            # unknown option
+	;;
+esac
+done
 
 # Import correct settings
 #
@@ -38,6 +76,6 @@ cd $WORK
 printf "\n3) Submitting job...\n"
 #sbatch scripts/job.bash 
 bash main.bash &
-printf "   ...done! Launcher exiting...\n\n"
+printf "   ...done! Launcher closing...\n\n"
 
 exit 1

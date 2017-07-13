@@ -23,7 +23,7 @@
 EXPL="EPS2"  # Long exp name
 EXPS="teps"       # 4 letter exp name
 SDATE=2013110212  # Exp start date
-EDATE=2013110212  # Exp end   date
+EDATE=2013110312  # Exp end   date
 DSTEP=24          # Hours between ensembles
 export EXPL EXPS SDATE EDATE DSTEP
 
@@ -56,7 +56,7 @@ MODEL_EXE=$HOME/projects/OIFS/oifs${OIFSv}/make/gnu-opt/oifs/bin/master.exe
 # --------------------------------------------------------------
 # Model structure and programs that are needed
 REQUIRE_DIRS="WORK SCRI DATA SRC BIN"
-REQUIRE_ITEMS="main.bash link.bash run.bash mandtg util_tools.bash write_makefile.bash define_makefile.bash ppro.bash ppro_ens.bash"
+REQUIRE_ITEMS="main.bash link.bash run.bash mandtg util_tools.bash define_makefile ppro.bash ppro_ens.bash"
 REQUIRE_NAMEL="namelist_${OIFSv}_general.bash namelist_${OIFSv}_t$RES.bash"
 
 

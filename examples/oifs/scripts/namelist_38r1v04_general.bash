@@ -120,3 +120,14 @@ else
       LSTOPH_SPBS=false,
     /"
 fi    
+
+# Add parameter value controls if TRUE
+if [ ! -z $LPAR ] && [ $LPAR == "true" ]; then
+    NAMCUMF="
+    &NAMCUMF
+      ENTSHALP=2.0,
+    /"
+
+else
+    NAMCUMF=""
+fi

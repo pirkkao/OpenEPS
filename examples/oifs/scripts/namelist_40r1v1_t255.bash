@@ -5,7 +5,7 @@
 if [ $imem -eq 0 ]; then
     name="ctrl"
 else
-    name=$(printf "pert%03d" $imem)
+    name=$(printf "$SUBDIR_NAME%03d" $imem)
 fi
     
 cat <<EOF > $SCRI/namelist.$name
@@ -191,6 +191,12 @@ NLON=512,
 &NAERAD
 CRTABLEDIR='./rtables/'
 /
+
+$NAMGRIB
+$NAMSPSDT
+$NAMSTOPH
+$NAMCUMF
+
 &NALBAR
 /
 &NALORI

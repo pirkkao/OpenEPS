@@ -6,7 +6,7 @@
 if [ $imem -eq 0 ]; then
     name="ctrl"
 else
-    name=$(printf "pert%03d" $imem)
+    name=$(printf "%s%03d" $SUBDIR_NAME $imem)
 fi
     
 cat <<EOF > $SCRI/namelist.$name
