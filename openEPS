@@ -8,9 +8,9 @@
 
 # Run options
 #
-NAME=test3
+NAME=test4
 MODEL=oifs
-HOST=ollin
+HOST=taito
 
 # Read in command line args
 #
@@ -63,7 +63,7 @@ printf '\n%s\n\n' "Start date for ensemble is $SDATE and end date $EDATE"
 
 # Check that all vital paths/executables exist
 #
-source bin/util_test.bash
+#source bin/util_test.bash
 
 # Initialize
 #
@@ -74,8 +74,15 @@ source bin/util_init.bash
 
 cd $WORK
 printf "\n3) Submitting job...\n"
-#sbatch scripts/job.bash 
-bash main.bash &
+
+if [ ! -z $SEND_AS_SINGLEJOB ]; then
+    #sbatch main.bash
+    echo "here"
+else
+    echo "xere"
+    #bash main.bash &
+fi
+
 printf "   ...done! Launcher closing...\n\n"
 
 exit 1

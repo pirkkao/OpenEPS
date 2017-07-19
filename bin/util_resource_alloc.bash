@@ -58,8 +58,11 @@ case "$launcher" in
 	parallel="$launcher -np $CPUSPERMODEL"
 	serial="bash"
 	;;
+    *)
+	printf "%s" "PARALLEL JOB LAUNCHER $parallel NOT CODED IN, ADD IT TO util_resource_alloc"
+	exit
+	;;
 esac
-
 
 # Write a source file
 cat <<EOF > $SRC/resources

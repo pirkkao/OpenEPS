@@ -9,7 +9,7 @@ if [ $SEND_AS_SINGLEJOB == "true" ]; then
 	if [ ! -z $line ]; then
 	    #echo "filled" ${line[@]}
 	    line="${line[@]}"
-	    sed -i -e "$((linenum+1))s;$;${line}\n;" $SCRI/main.bash
+	    sed -i -e "$((linenum+1))s;$;${line}\n;" $WORK/main.bash
 	    linenum=$(( linenum+1 ))
 	else
 	    #echo "empty" ${line[@]}

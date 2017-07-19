@@ -35,7 +35,7 @@ if [ ! -e $DATA/Makefile ]; then
     
 	# Let make take over
 	if [ $VERBOSE -eq 1 ]; then
-	    make -s -f makefile_$cdate -j $PARALLELS_IN_NODE
+	    make    -f makefile_$cdate -j $PARALLELS_IN_NODE
 	else
 	    make -s -f makefile_$cdate -j $PARALLELS_IN_NODE > /dev/null 2>&1
 	fi
