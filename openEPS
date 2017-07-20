@@ -9,8 +9,8 @@
 # Run options
 #
 NAME=test
-MODEL=oifs-hpc_setup
-HOST=taito
+MODEL=oifs
+HOST=ollin
 
 # Read in command line args
 #
@@ -76,11 +76,9 @@ cd $WORK
 printf "\n3) Submitting job...\n"
 
 if [ ! -z $SEND_AS_SINGLEJOB ]; then
-    #sbatch main.bash
-    echo "here"
+    sbatch main.bash
 else
-    echo "xere"
-    #bash main.bash &
+    bash main.bash &
 fi
 
 printf "   ...done! Launcher closing...\n\n"

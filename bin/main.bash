@@ -14,7 +14,9 @@ printf "\n\n4) Now in main.bash\n"
 
 # Set program source, work directories and available resources
 #
-for f in configs/*; do source $f; done
+source configs/exp.*
+source configs/env.*
+source configs/resources
 
 
 # Loop over dates

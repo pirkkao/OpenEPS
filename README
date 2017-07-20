@@ -20,7 +20,7 @@ likely be changed until everything is clean and understandable.
 So, please be patient when using!
 
  --------------------------------------------------------------
-  Strucure:
+  Structure:
  --------------------------------------------------------------
 All common utility scripts and programs can be found in bin/.
 A few example setups are available in examples/. These provide
