@@ -40,8 +40,13 @@ for item in $REQUIRE_DIRS; do
 done
 
 
+# Get model base folder name
+#
+modelbase=$(echo $MODEL | cut -d- -f1)
+
 # Copy scripts
 #
+default=""
 for item in $REQUIRE_ITEMS $REQUIRE_NAMEL; do
     if [ -f   examples/$MODEL/scripts/$item ]; then
 	cp -f examples/$MODEL/scripts/$item $SCRI/.
@@ -50,7 +55,22 @@ for item in $REQUIRE_ITEMS $REQUIRE_NAMEL; do
     elif [ ! -z ${!item} ] && [ -f ${!item} ] ; then
 	cp -f ${!item} $WORK/.
     else
-	printf '\n%s\n' "Aborting, $item not found..."
+	default="$default $item"
+    fi
+done
+
+echo $default
+
+# Complete by default scripts
+for item in $default; do
+    if [ -f   examples/$modelbase/scripts/$item ]; then
+	cp    examples/$modelbase/scripts/$item $SCRI/.
+    elif [ -f bin/$item ]; then
+	cp    bin/$item $WORK/.
+    elif [ ! -z ${!item} ] && [ -f ${!item} ] ; then
+	cp    ${!item} $WORK/.
+    else
+	printf "%s\n" "$item not found, aborting..."
 	exit 1
     fi
 done

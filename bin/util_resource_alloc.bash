@@ -71,4 +71,7 @@ export PARALLELS_IN_NODE=$parallels_in_node
 export PARALLEL_NODES=$parallel_nodes
 export parallel="$parallel"
 export serial="$serial"
+
+export VERBOSE=$VERBOSE
+export SUBDIR_NAME=$SUBDIR_NAME
 EOF

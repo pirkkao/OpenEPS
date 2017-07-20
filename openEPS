@@ -8,8 +8,8 @@
 
 # Run options
 #
-NAME=test4
-MODEL=oifs
+NAME=test
+MODEL=oifs-hpc_setup
 HOST=taito
 
 # Read in command line args
