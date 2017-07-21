@@ -37,9 +37,9 @@ if [ ! -e $DATA/Makefile ]; then
     
 	# Let make take over
 	if [ $VERBOSE -eq 1 ]; then
-	    make    -f makefile_$cdate -j $PARALLELS_IN_NODE
+	    make    -f makefile_$cdate -j $(( PARALLELS_IN_NODE * PARALLEL_NODES ))
 	else
-	    make -s -f makefile_$cdate -j $PARALLELS_IN_NODE > /dev/null 2>&1
+	    make -s -f makefile_$cdate -j $(( PARALLELS_IN_NODE * PARALLEL_NODES )) > /dev/null 2>&1
 	fi
 	    
 	cdate=$ndate

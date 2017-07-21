@@ -12,7 +12,7 @@ else
     verbose=false
 fi
 printf "   Verbose = $verbose\n"
-printf "   Restart = $RESTART\n"
+printf "   Restart = $RESTART\n\n"
 
 
 
@@ -59,8 +59,6 @@ for item in $REQUIRE_ITEMS $REQUIRE_NAMEL; do
     fi
 done
 
-echo $default
-
 # Complete by default scripts
 for item in $default; do
     if [ -f   examples/$modelbase/scripts/$item ]; then
@@ -74,7 +72,11 @@ for item in $default; do
 	exit 1
     fi
 done
-
+printf "%s %s\n" "   Files requested:    $REQUIRE_ITEMS $REQUIRE_NAMEL"
+if [ ! $modelbase == $MODEL ]; then
+printf "%s \n"   "   Default files used: $default"
+fi
+printf "\n"
 
 # Copy configs
 #
