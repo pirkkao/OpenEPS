@@ -14,7 +14,7 @@
 # GENERAL
 # --------------------------------------------------------------
 # Basics
-EXPL="EPS3"  # Long exp name
+EXPL="EPS_par"  # Long exp name
 EXPS="teps"       # 4 letter exp name
 SDATE=2013110212  # Exp start date
 EDATE=2013110212  # Exp end   date
@@ -43,15 +43,16 @@ OIFSv=40r1v1
 # Model bin
 MODEL_EXE=$HOME/projects/OIFS/oifs${OIFSv}/make/gnu-opt/oifs/bin/master.exe
 
-
+# EPPES bin
+EPPES_EXE=/home/ollin/playground/eppes/eppes_routine
 
 # --------------------------------------------------------------
 # REQUIRED DIRS AND SCRIPTS
 # --------------------------------------------------------------
 # Model structure and programs that are needed
 REQUIRE_DIRS="WORK SCRI DATA SRC BIN"
-REQUIRE_ITEMS="main.bash link.bash run.bash mandtg util_tools.bash write_makefile.bash define_makefile.bash ppro.bash ppro_ens.bash par_gen.bash par_set.bash"
-REQUIRE_NAMEL="namelist_${OIFSv}_general.bash namelist_${OIFSv}_t$RES.bash"
+REQUIRE_ITEMS="main.bash link.bash run.bash mandtg util_tools.bash define_makefile ppro.bash ppro_ens.bash par_init.bash par_gen.bash par_set.bash"
+REQUIRE_NAMEL="namelist_general.bash namelist_${OIFSv}_t$RES.bash"
 
 
 
@@ -59,7 +60,7 @@ REQUIRE_NAMEL="namelist_${OIFSv}_general.bash namelist_${OIFSv}_t$RES.bash"
 # TESTING
 # --------------------------------------------------------------
 # Vital executables that must exist
-REQUIRE_PATHS="$REQUIRE_PATHS MODEL_EXE cdo mpirun"
+REQUIRE_PATHS="$REQUIRE_PATHS MODEL_EXE EPPES_EXE cdo mpirun"
 
 # Vital variables that must exist
 REQUIRE_VARS="$REQUIRE_VARS EXPL EXPS SDATE EDATE DSTEP RES LEV FCLEN ENS NNODES"

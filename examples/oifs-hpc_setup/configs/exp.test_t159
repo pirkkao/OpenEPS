@@ -53,7 +53,7 @@ MODEL_EXE=/appl/earth/openifs/intel-16.0.0/intelmpi-5.1.1/38r1v04/bin/master.exe
 # Model structure and programs that are needed
 REQUIRE_DIRS="WORK SCRI DATA SRC BIN"
 REQUIRE_ITEMS="main.bash link.bash run.bash mandtg util_tools.bash define_makefile ppro.bash ppro_ens.bash"
-REQUIRE_NAMEL="namelist_${OIFSv}_general.bash namelist_${OIFSv}_t$RES.bash"
+REQUIRE_NAMEL="namelist_general.bash namelist_${OIFSv}_t$RES.bash"
 
 
 

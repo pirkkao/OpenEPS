@@ -6,13 +6,28 @@
 # Determine lat/lon/lev, length of time step and output interval
 #
 if [ $RES -eq 639 ]; then
-    lon=768
-    lat=384
+    lon=1280
+    lat=640
     lev=91
     tim=900.0
+elif [ $RES -eq 511 ]; then
+    lon=1024
+    lat=512
+    lev=91
+    tim=900.0
+elif [ $RES -eq 399 ]; then
+    lon=800
+    lat=400
+    lev=91
+    tim=1200.0
+elif [ $RES -eq 319 ]; then
+    lon=640
+    lat=320
+    lev=91
+    tim=1200.0
 elif [ $RES -eq 255 ]; then
-    lon=768
-    lat=384
+    lon=512
+    lat=256
     lev=91
     tim=2700.0
 elif [ $RES -eq 159 ]; then
@@ -24,7 +39,7 @@ elif [ $RES -eq 21 ]; then
     lon=64
     lat=32
     lev=19
-    tim=600.0
+    tim=1800.0
 else
     echo "Resolution not defined!"
     exit 1

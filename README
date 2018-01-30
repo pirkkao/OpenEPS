@@ -7,7 +7,7 @@ usage : ./openEPS [Options]
    -m, --model   Select model to run
    -r, --restart Remove existing exp data folder and do a
                  clean run
-   -v, --verbose Print stderr and stdout on konsole
+   -s, --silent  Do not print stderr and stdout on konsole
    -h, --help    This help
    --kill        [Kill already running exp]
 
@@ -48,8 +48,8 @@ guidance on how to setup and utilize openEPS for running
     - Adjust model namelist(s) accordingly
     - Create explicit makefiles for all dates
     - Initialize parameter estimation
-   [- Modify patch job resource requirements ]
-   [- Adjust post processing scripts ]  
+   - Modify patch job resource requirements
+   - Adjust post processing scripts  
    (bin/util_init.bash)  
 
  4) Submit batchjob, or launch a new bash shell
@@ -87,18 +87,12 @@ exp.test3
 
 
  --------------------------------------------------------------
-  ISSUES/TBD (6th June 2017):
+  ISSUES/TBD (30th January 2018):
  --------------------------------------------------------------
  
-i) There is no real initial state generation process now. Hopefully 
-Glenn's solution for the vertical and horizontal resolution changes are
-easy for you to implement. My idea was to do the resolution changes within
-the job to minimize the need for diskspace (remember to delete all 
-unnecessary files after a date!), this would also allow for a flexible
-system if the system is run with different resolutions.
 
 
 
 Pirkka Ollinaho, pirkka.ollinaho@fmi.fi
-13th July 2017
+30th January 2018
 

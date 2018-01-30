@@ -8,9 +8,9 @@
 
 # Run options
 #
-NAME=test_t159
-MODEL=oifs-hpc_setup
-HOST=taito-test
+NAME=test
+MODEL=oifs
+HOST=ollin
 
 # Read in command line args
 #
