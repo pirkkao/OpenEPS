@@ -19,7 +19,11 @@ for step in $steps; do
     cdo -selzaxis,1 -selvar,var130,var129 temp.grb1 temp.grb
     
     # Do a spectral transform to gg
-    cdo -sp2gp temp.grb PP_${EXPS}+00${step}
+    if [ $RES -eq 21 ]; then
+	cdo -sp2gp  temp.grb PP_${EXPS}+00${step}
+    else
+	cdo -sp2gpl temp.grb PP_${EXPS}+00${step}
+    fi
 
     rm -f temp.grb temp.grb1
 done

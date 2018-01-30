@@ -41,6 +41,12 @@ else
     parallels=$(echo "$parallels_in_node * $parallel_nodes" | bc)
 fi
 
+# Fix parallels to be at least 1
+if [ $parallels_in_node -eq 0 ]; then
+    parallels_in_node=1
+fi
+
+
 # Estimate time reservation
 totaltime=$(echo "$TIMEFORMODEL * $ENS * $dates" | bc)
 reservation=$(echo "$totaltime / $parallels" | bc)

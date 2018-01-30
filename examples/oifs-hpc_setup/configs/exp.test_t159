@@ -18,16 +18,16 @@
 # GENERAL
 # --------------------------------------------------------------
 # Basics
-EXPL="EPS"  # Long exp name
-EXPS="teps"       # 4 letter exp name
-SDATE=2013110212  # Exp start date
-EDATE=2013110312  # Exp end   date
+EXPL="EPS_t159"  # Long exp name
+EXPS="eps2"       # 4 letter exp name
+SDATE=2016010100  # Exp start date
+EDATE=2016010100  # Exp end   date
 DSTEP=24          # Hours between ensembles
 export EXPL EXPS SDATE EDATE DSTEP
 
 # Resolution, vertical levels, model run length (in steps[/hours/days])
-RES=21
-LEV=19
+RES=159
+LEV=91
 FCLEN=12
 
 # Ensemble size (CTRL is always member 0, so real size is ENS+1)
@@ -37,8 +37,8 @@ ENS=3
 # (number of nodes, number of cores per model,
 # estimate of model execution time)
 NNODES=2
-CPUSPERMODEL=4
-TIMEFORMODEL=0.5
+CPUSPERMODEL=24
+TIMEFORMODEL=2.
 export RES LEV FCLEN ENS NNODES
 
 # Version

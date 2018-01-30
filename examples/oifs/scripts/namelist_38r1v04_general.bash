@@ -15,6 +15,11 @@ elif [ $RES -eq 255 ]; then
     lat=384
     lev=91
     tim=2700.0
+elif [ $RES -eq 159 ]; then
+    lon=320
+    lat=160
+    lev=91
+    tim=3600.0
 elif [ $RES -eq 21 ]; then
     lon=64
     lat=32
