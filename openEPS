@@ -8,13 +8,13 @@
 
 # Run options
 #
-NAME=test
-MODEL=oifs
-HOST=ollin
+NAME=test_t159
+MODEL=oifs-hpc_setup
+HOST=taito-test
 
 # Read in command line args
 #
-export VERBOSE=0
+export VERBOSE=1
 RESTART="false"
 
 for arg in "$@"
@@ -34,8 +34,8 @@ case $arg in
 	RESTART="true"
 	shift # past empty argument
 	;;
-    -v|--verbose)
-	VERBOSE=1
+    -s|--silent)
+	VERBOSE=0
 	shift # past empty argument
 	;;
     -h|--help)
