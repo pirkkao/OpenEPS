@@ -110,8 +110,9 @@ else
     CTYPE="pf"
 fi
 
+
 # Add SPPT switches if TRUE
-if [ $LSPPT == "true" ]; then
+if [ $LSPPT == "true" ] && [ $imem -gt 0 ]; then
     NAMSPSDT="
     &NAMSPSDT
       LSPSDT=true,
@@ -128,7 +129,7 @@ else
 fi
 
 # Add SKEB switches if TRUE
-if [ $LSKEB == "true" ]; then
+if [ $LSKEB == "true" ] && [ $imem -gt 0 ]; then
     NAMSTOPH="
     &NAMSTOPH
       LSTOPH_SPBS=true,
@@ -142,7 +143,7 @@ else
 fi    
 
 # Add parameter value controls if TRUE
-if [ ! -z $LPAR ] && [ $LPAR == "true" ]; then
+if [ ! -z $LPAR ] && [ $LPAR == "true" ] && [ $imem -gt 0 ]; then
     NAMCUMF="
     &NAMCUMF
       ENTSHALP=2.0,

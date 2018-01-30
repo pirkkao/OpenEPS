@@ -77,7 +77,7 @@ LSPPT="false"
 LSKEB="false" # "true" does not work with cy38r1
 
 # Initial state perturbations
-INIPERT=1
+export INIPERT=1
 
 
 # --------------------------------------------------------------
