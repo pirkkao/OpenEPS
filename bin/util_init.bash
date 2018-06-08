@@ -42,20 +42,16 @@ done
 
 # Get model base folder name
 #
-modelbase=$(echo $MODEL | cut -d- -f1)
+#modelbase=$(echo $MODEL | cut -d- -f1)
 
 # Copy scripts
 #
 default=""
 modded=""
 for item in $REQUIRE_ITEMS $REQUIRE_NAMEL; do
-    if [ -f   examples/$MODEL/scripts/$item ]; then
-	cp -f examples/$MODEL/scripts/$item $SCRI/.
+    if [ -f   examples/$MODEL/scripts-$SCR_MOD/$item ]; then
+	cp -f examples/$MODEL/scripts-$SCR_MOD/$item $SCRI/.
 	modded="$modded $item"
-    #elif [ -f bin/$item ]; then
-	#cp -f bin/$item $WORK/.
-    elif [ ! -z ${!item} ] && [ -f ${!item} ] ; then
-	cp -f ${!item} $WORK/.
     else
 	default="$default $item"
     fi
@@ -64,8 +60,8 @@ done
 # Complete by default scripts
 nonutil=""
 for item in $default; do
-    if [ -f   examples/$modelbase/scripts/$item ]; then
-	cp    examples/$modelbase/scripts/$item $SCRI/.
+    if [ -f   examples/$MODEL/scripts/$item ]; then
+	cp    examples/$MODEL/scripts/$item $SCRI/.
 	nonutil="$nonutil $item"
     elif [ -f bin/$item ]; then
 	cp    bin/$item $WORK/.
