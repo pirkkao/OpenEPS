@@ -13,17 +13,25 @@ echo `date +%H:%M:%S` post-pro $SUBDIR_NAME${nid} >> $WORK/master.log
 
 for step in $steps; do
     # convert to GRIB1
-    $GRIBTOOLS/grib_set -s edition=1 ICMSH${EXPS}+00${step} temp.grb1
+    $GRIBTOOLS/grib_set -s edition=1 ICMSH${EXPS}+00${step} temp1.grb1
+    $GRIBTOOLS/grib_set -s edition=1 ICMGG${EXPS}+00${step} temp2.grb1
 
-    # Select pressure level variables t and z
-    cdo -selzaxis,1 -selvar,var130,var129 temp.grb1 temp.grb
+    # Select pressure and surface level variables
+    cdo -selzaxis,pressure         temp1.grb1 temp1.grb
+    cdo -selzaxis,pressure,surface temp2.grb1 temp2.grb
     
     # Do a spectral transform to gg
     if [ $RES -eq 21 ]; then
-	cdo -sp2gp  temp.grb PP_${EXPS}+00${step}
+	cdo -sp2gp  temp1.grb temp_gg.grb
     else
-	cdo -sp2gpl temp.grb PP_${EXPS}+00${step}
+	cdo -sp2gpl temp1.grb temp_gg.grb
     fi
 
-    rm -f temp.grb temp.grb1
+    # Transform GG to regular gaussian
+    cdo -R copy temp2.grb temp3.grb
+
+    # Merge
+    cdo -merge temp_gg.grb temp3.grb PP_${EXPS}+00${step}
+
+    rm -f temp*.grb temp*.grb1
 done

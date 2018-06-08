@@ -5,7 +5,6 @@ date=${1}
 # Log
 echo `date +%H:%M:%S` pargener "ens   " >> $WORK/master.log
 
-
 # Generate random cost func values
 if [ 1 -eq 1 ]; then
 # Set up an awk function for real number calculations

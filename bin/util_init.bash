@@ -47,11 +47,13 @@ modelbase=$(echo $MODEL | cut -d- -f1)
 # Copy scripts
 #
 default=""
+modded=""
 for item in $REQUIRE_ITEMS $REQUIRE_NAMEL; do
     if [ -f   examples/$MODEL/scripts/$item ]; then
 	cp -f examples/$MODEL/scripts/$item $SCRI/.
-    elif [ -f bin/$item ]; then
-	cp -f bin/$item $WORK/.
+	modded="$modded $item"
+    #elif [ -f bin/$item ]; then
+	#cp -f bin/$item $WORK/.
     elif [ ! -z ${!item} ] && [ -f ${!item} ] ; then
 	cp -f ${!item} $WORK/.
     else
@@ -60,9 +62,11 @@ for item in $REQUIRE_ITEMS $REQUIRE_NAMEL; do
 done
 
 # Complete by default scripts
+nonutil=""
 for item in $default; do
     if [ -f   examples/$modelbase/scripts/$item ]; then
 	cp    examples/$modelbase/scripts/$item $SCRI/.
+	nonutil="$nonutil $item"
     elif [ -f bin/$item ]; then
 	cp    bin/$item $WORK/.
     elif [ ! -z ${!item} ] && [ -f ${!item} ] ; then
@@ -72,10 +76,9 @@ for item in $default; do
 	exit 1
     fi
 done
-printf "%s %s\n" "   Files requested:    $REQUIRE_ITEMS $REQUIRE_NAMEL"
-if [ ! $modelbase == $MODEL ]; then
-printf "%s \n"   "   Default files used: $default"
-fi
+
+printf "%s %s\n" "   Scripts requested:   $nonutil"
+printf "%s \n"   "   Non-default scripts: $modded"
 printf "\n"
 
 # Copy configs
@@ -98,7 +101,7 @@ export SUBDIR_NAME
 source bin/util_resource_alloc.bash
 
 printf "   *************************************************************\n"
-printf "   OpenEPS will reserve $totncpus cores on $NNODES node(s) for $reservation minutes!\n"
+printf "   OpenEPS will reserve $totncpus cores for $EXPTIME\n"
 printf "   $parallels parallel models will be run, each on $CPUSPERMODEL core(s)\n"
 printf "   *************************************************************\n"
 

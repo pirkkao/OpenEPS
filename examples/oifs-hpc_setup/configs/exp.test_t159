@@ -18,12 +18,11 @@
 # GENERAL
 # --------------------------------------------------------------
 # Basics
-EXPL="EPS_t159"  # Long exp name
-EXPS="eps2"       # 4 letter exp name
-SDATE=2016010100  # Exp start date
-EDATE=2016010100  # Exp end   date
-DSTEP=24          # Hours between ensembles
-export EXPL EXPS SDATE EDATE DSTEP
+EXPL="test3"  # Long exp name
+EXPS="epst"       # 4 letter exp name
+SDATE=2017080100  # Exp start date
+EDATE=2017080100  # Exp end   date
+DSTEP=12          # Hours between ensembles
 
 # Resolution, vertical levels, model run length (in steps[/hours/days])
 RES=159
@@ -31,15 +30,10 @@ LEV=91
 FCLEN=12
 
 # Ensemble size (CTRL is always member 0, so real size is ENS+1)
-ENS=3
+ENS=1
 
-# Resources
-# (number of nodes, number of cores per model,
-# estimate of model execution time)
-NNODES=2
-CPUSPERMODEL=24
-TIMEFORMODEL=2.
-export RES LEV FCLEN ENS NNODES
+# Folder for modded scripts (e.g. "-parest", when scripts are in /scripts-parest/)
+SCR_MOD=""
 
 # Version
 OIFSv=38r1v04
@@ -47,12 +41,41 @@ OIFSv=38r1v04
 # Model bin
 MODEL_EXE=/appl/earth/openifs/intel-16.0.0/intelmpi-5.1.1/38r1v04/bin/master.exe
 
+export EXPL EXPS SDATE EDATE DSTEP RES LEV FCLEN ENS
+
+
+
+# --------------------------------------------------------------
+# RESOURCES
+# --------------------------------------------------------------
+# Number of nodes or number of cores per model
+NNODES=
+# or
+CPUSTOT=24
+
+# CPUs per single model
+CPUSPERMODEL=12
+
+# Time allocation, either specify run time of a single model instance [min]
+# or estimate bulk time (HH:MM:SS). NOTE: use TIMEFORMODEL with caution,
+# see the time estimation formula in env.-configuration file.
+TIMEFORMODEL=2
+# or
+EXPTIME=
+
+# Which queue to submit the job to
+BATCHQUEUE=test #parallel
+
+export NNODES CPUSTOT CPUSPERMODEL TIMEFORMODEL EXPTIME BATCHQUEUE
+
+
+
 # --------------------------------------------------------------
 # REQUIRED DIRS AND SCRIPTS
 # --------------------------------------------------------------
 # Model structure and programs that are needed
 REQUIRE_DIRS="WORK SCRI DATA SRC BIN"
-REQUIRE_ITEMS="main.bash link.bash run.bash mandtg util_tools.bash define_makefile ppro.bash ppro_ens.bash"
+REQUIRE_ITEMS="main.bash link.bash run.bash mandtg util_tools.bash define_makefile ppro.bash ppro_ens.bash  par_init.bash par_gen.bash par_set.bash"
 REQUIRE_NAMEL="namelist_general.bash namelist_${OIFSv}_t$RES.bash"
 
 
@@ -73,8 +96,11 @@ REQUIRE_VARS="$REQUIRE_VARS EXPL EXPS SDATE EDATE DSTEP RES LEV FCLEN ENS NNODES
 # --------------------------------------------------------------
 
 # Stochastic physics
-LSPPT="true"
+LSPPT="false"
 LSKEB="false" # "true" does not work with cy38r1
+
+# Initial state perturbations
+export INIPERT=1
 
 
 
@@ -89,16 +115,17 @@ NPOSTS=0
 NHISTS=0
 
 # Model level variables and model levels
-VARSM="130 138 155 133"   # String list with spaces in between
+# (leave VARSX as "" if no output is desired)
+VARSM=""   # String list with spaces in between
 LEVSM=$(echo $(seq 19)) # String list with spaces in between
 LEVSM="-99"
 
 # Pressure level variables and pressure levels (in Pa)
-VARSP="129 130"
+VARSP="129 130 133"
 LEVSP="50000.0 92500.0"
 
 # Surface level dynamic variables
-VARSS="129 152"
+VARSS="" #129 152"
 
 # Surface variables
 VARPP="151 165 176 177 208"
@@ -109,7 +136,8 @@ VARPP="151 165 176 177 208"
 # POST-PROCESSING
 # --------------------------------------------------------------
 
-# pp freqency, space separated list of model times steps
+# pp freqency, space separated list of model times step
+# (set here to be the same as model output freq)
 NPPRO=""
 ttime=$NFRPOS
 while [ $ttime -le $FCLEN ]; do
@@ -117,3 +145,16 @@ while [ $ttime -le $FCLEN ]; do
     ttime=$(( ttime + NFRPOS ))
 done
 # 
+
+
+
+# --------------------------------------------------------------
+# PARAMETER ESTIMATION
+# --------------------------------------------------------------
+
+# EPPES bin
+EPPES_EXE=/homeappl/home/lautuppi/appl_taito/EPPES/eppes_routine
+
+LPAR="true"
+
+export EPPES_EXE LPAR

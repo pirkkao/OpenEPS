@@ -33,19 +33,38 @@ FCLEN=12
 # Ensemble size (CTRL is always member 0, so real size is ENS+1)
 ENS=3
 
-# Resources
-# (number of nodes, number of cores per model,
-# estimate of model execution time)
-NNODES=2
-CPUSPERMODEL=4
-TIMEFORMODEL=0.5
-export RES LEV FCLEN ENS NNODES
-
 # Version
 OIFSv=38r1v04
 
 # Model bin
 MODEL_EXE=/appl/earth/openifs/intel-16.0.0/intelmpi-5.1.1/38r1v04/bin/master.exe
+
+
+
+# --------------------------------------------------------------
+# RESOURCES
+# --------------------------------------------------------------
+# Number of nodes or number of cores per model
+NNODES=2
+# or
+CPUSTOT=
+
+# CPUs per single model
+CPUSPERMODEL=4
+
+# Time allocation, either specify run time of a single model instance [min]
+# or estimate bulk time (HH:MM:SS). NOTE: use TIMEFORMODEL with caution,
+# see the time estimation formula in env-config.
+TIMEFORMODEL=1
+# or
+EXPTIME=
+
+# Which queue to submit the job to
+BATCHQUEUE=test #parallel
+
+export RES LEV FCLEN ENS NNODES CPUSPERMODEL EXPTIME BATCHQUEUE
+
+
 
 # --------------------------------------------------------------
 # REQUIRED DIRS AND SCRIPTS
@@ -75,6 +94,9 @@ REQUIRE_VARS="$REQUIRE_VARS EXPL EXPS SDATE EDATE DSTEP RES LEV FCLEN ENS NNODES
 # Stochastic physics
 LSPPT="true"
 LSKEB="false" # "true" does not work with cy38r1
+
+# Initial state perturbations
+export INIPERT=1
 
 
 

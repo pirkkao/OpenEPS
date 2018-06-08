@@ -29,7 +29,7 @@ if [ ! -e $DATA/Makefile ]; then
 	cd $DATA/$cdate
 	# Log
 	printf "\nRunning ens for $cdate\n"   >> $WORK/master.log
-	date | echo `exec cut -b13-21`   init >> $WORK/master.log
+	echo `date +%H:%M:%S` init            >> $WORK/master.log
 	printf "   Processing date $cdate "
 	
 	# Define next date

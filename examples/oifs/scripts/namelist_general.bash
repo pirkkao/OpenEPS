@@ -55,11 +55,11 @@ varpp=( $VARPP )
 NPROC=$CPUSPERMODEL
 
 #NAMDYN  - Change model time step according to used resolution
-TSTEP=${tim:-2700.0}
+TSTEP=$tim
 
 #NAMFPG  - Change resolution
 LEV=$lev
-NFPMAX=${RES:-255}
+NFPMAX=$RES
 
 #NAMCT0  - Change experiment name, run length and output time interval
 CNMEXP=$EXPS
@@ -70,24 +70,32 @@ NPOSTS=0
 NHISTS=0
  
 #NAMFPC  - Change output fields
-
+#
 # Model level variables, their count and model levels
-MFP3DFS=${VARSM// /,} # Replace spaces with commas
-NFP3DFS=${#varsm[@]}  # Number of elements in the array
-NRFP3S=${LEVSM// /,} 
+if [ ! -z $varsm ]; then
+    MFP3DFS="MFP3DFS(1:)=${VARSM// /,}," # Replace spaces with commas
+    NFP3DFS="NFP3DFS=${#varsm[@]},"  # Number of elements in the array
+    NRFP3S="NRFP3S=${LEVSM// /,},"
+fi
 
 # Pressure level variables,their count and pressure levels (in Pa)
-MFP3DFP=${VARSP// /,}
-NFP3DFP=${#varsp[@]}
-RFP3P=${LEVSP// /,}
+if [ ! -z $varsp ]; then
+    MFP3DFP="MFP3DFP=${VARSP// /,},"
+    NFP3DFP="NFP3DFP=${#varsp[@]},"
+    RFP3P="RFP3P(1:)=${LEVSP// /,},"
+fi
 
 # Surface level dynamic variables and their count
-MFP2DF=${VARSS// /,}
-NFP2DF=${#varss[@]}
+if [ ! -z $varss ]; then
+    MFP2DF="MFP2DF=${VARSS// /,},"
+    NFP2DF="NFP2DF=${#varss[@]},"
+fi
 
 # Surface variables and their count
-MFPPHY=${VARPP// /,}
-NFPPHY=${#varpp[@]}
+if [ ! -z $varpp ]; then
+    MFPPHY="MFPPHY(1:)=${VARPP// /,},"
+    NFPPHY="NFPPHY=${#varpp[@]},"
+fi
 
 #NAMFPD  - Change grid point variables' output resolution
 NLAT=$lat
