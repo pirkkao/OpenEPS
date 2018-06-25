@@ -8,7 +8,7 @@
 
 # Run options
 #
-NAME=test_parest
+NAME=test_iniamp
 MODEL=oifs
 HOST=taito
 

@@ -18,6 +18,10 @@ source configs/exp.*
 source configs/env.*
 source configs/resources
 
+# Additional make-tasks
+if [ ! -z $EXTRA_TASKS ]; then
+  EXTRA_TASKS=0
+fi
 
 # Loop over dates
 #
@@ -37,11 +41,12 @@ if [ ! -e $DATA/Makefile ]; then
     
 	# Let make take over
 	if [ $VERBOSE -eq 1 ]; then
-	    make    -f makefile_$cdate -j $(( PARALLELS_IN_NODE * PARALLEL_NODES ))
+	    make    -f makefile_$cdate -j $(( PARALLELS_IN_NODE * PARALLEL_NODES + EXTRA_TASKS ))
 	else
-	    make -s -f makefile_$cdate -j $(( PARALLELS_IN_NODE * PARALLEL_NODES )) > /dev/null 2>&1
+	    make -s -f makefile_$cdate -j $(( PARALLELS_IN_NODE * PARALLEL_NODES + EXTRA_TASKS )) > /dev/null 2>&1
 	fi
 	    
+
 	cdate=$ndate
 	printf "\n"
     done

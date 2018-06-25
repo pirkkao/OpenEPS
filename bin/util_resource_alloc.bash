@@ -47,13 +47,6 @@ if [ $parallels_in_node -eq 0 ]; then
     parallels_in_node=1
 fi
 
-
-# Estimate time reservation
-totaltime=$(echo "$TIMEFORMODEL * $ENS * $dates" | bc)
-reservation=$(echo "$totaltime / $parallels" | bc)
-
-
-
 # (MPI) launcher
 launcher=$(basename $(which aprun 2> /dev/null || which srun 2> /dev/null || which mpirun 2> /dev/null || which bash ))
 case "$launcher" in
