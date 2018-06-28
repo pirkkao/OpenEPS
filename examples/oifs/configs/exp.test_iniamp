@@ -18,8 +18,8 @@
 # GENERAL
 # --------------------------------------------------------------
 # Basics
-EXPL="test_rnd"  # Long exp name
-EXPS="epst"       # 4 letter exp name
+EXPL="test3"  # Long exp name
+EXPS="eps3"       # 4 letter exp name
 SDATE=2017080100  # Exp start date
 EDATE=2017080100  # Exp end   date
 DSTEP=12          # Hours between ensembles
@@ -54,7 +54,7 @@ NNODES=
 CPUSTOT=24
 
 # CPUs per single model
-CPUSPERMODEL=12
+CPUSPERMODEL=8
 
 # Time allocation, either specify run time of a single model instance [min]
 # or estimate bulk time (HH:MM:SS). NOTE: use TIMEFORMODEL with caution,
@@ -79,7 +79,7 @@ export NNODES CPUSTOT CPUSPERMODEL TIMEFORMODEL EXPTIME BATCHQUEUE
 # Model structure and programs that are needed
 REQUIRE_DIRS="WORK SCRI DATA SRC BIN"
 REQUIRE_ITEMS="main.bash link.bash run.bash mandtg util_tools.bash define_makefile ppro.bash ppro_ens.bash"
-REQUIRE_NAMEL="namelist_general.bash namelist_${OIFSv}_t$RES.bash"
+REQUIRE_NAMEL="namelist_general.bash namelist_${OIFSv}.bash"
 
 
 

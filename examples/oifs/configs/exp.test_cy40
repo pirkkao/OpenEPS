@@ -18,8 +18,8 @@
 # GENERAL
 # --------------------------------------------------------------
 # Basics
-EXPL="test2"  # Long exp name
-EXPS="part"       # 4 letter exp name
+EXPL="test5"  # Long exp name
+EXPS="epst"       # 4 letter exp name
 SDATE=2017080100  # Exp start date
 EDATE=2017080100  # Exp end   date
 DSTEP=12          # Hours between ensembles
@@ -33,13 +33,13 @@ FCLEN=12
 ENS=2
 
 # Folder for modded scripts (e.g. "parest", when scripts are in /scripts-parest/)
-SCR_MOD="parest"
+SCR_MOD=""
 
 # Version
-OIFSv=38r1v04
+OIFSv=40r1v1
 
 # Model bin
-MODEL_EXE=/appl/earth/openifs/intel-16.0.0/intelmpi-5.1.1/38r1v04/bin/master.exe
+MODEL_EXE=/appl/earth/openifs/40r1v1.1/intel-16.0.0/intelmpi-5.1.1/bin/master.exe
 
 export EXPL EXPS SDATE EDATE DSTEP RES LEV FCLEN ENS
 
@@ -59,9 +59,9 @@ CPUSPERMODEL=8
 # Time allocation, either specify run time of a single model instance [min]
 # or estimate bulk time (HH:MM:SS). NOTE: use TIMEFORMODEL with caution,
 # see the time estimation formula in env.-configuration file.
-TIMEFORMODEL=
+TIMEFORMODEL=4
 # or
-EXPTIME="00:06:00"
+EXPTIME=
 
 # Which queue to submit the job to
 BATCHQUEUE=test #parallel
@@ -75,7 +75,7 @@ export NNODES CPUSTOT CPUSPERMODEL TIMEFORMODEL EXPTIME BATCHQUEUE
 # --------------------------------------------------------------
 # Model structure and programs that are needed
 REQUIRE_DIRS="WORK SCRI DATA SRC BIN"
-REQUIRE_ITEMS="main.bash link.bash run.bash mandtg util_tools.bash define_makefile ppro.bash ppro_ens.bash  par_init.bash par_gen.bash par_set.bash"
+REQUIRE_ITEMS="main.bash link.bash run.bash mandtg util_tools.bash define_makefile ppro.bash ppro_ens.bash"
 REQUIRE_NAMEL="namelist_general.bash namelist_${OIFSv}.bash"
 
 
@@ -96,7 +96,7 @@ REQUIRE_VARS="$REQUIRE_VARS EXPL EXPS SDATE EDATE DSTEP RES LEV FCLEN ENS NNODES
 # --------------------------------------------------------------
 
 # Stochastic physics
-LSPPT="false"
+LSPPT="true"
 LSKEB="false" # "true" does not work with cy38r1
 
 # Initial state perturbations
@@ -155,6 +155,6 @@ done
 # EPPES bin
 EPPES_EXE=/homeappl/home/lautuppi/appl_taito/EPPES/eppes_routine
 
-LPAR="true"
+LPAR="false"
 
 export EPPES_EXE LPAR

@@ -31,7 +31,7 @@ YS_NL%NREQIN=-1,
   NOUTPUT=1,
 /   
 &NAMCT0
- LFPOS=TRUE,
+ NFPOS=2,
  LREFOUT=false,
  N3DINI=0,
  NSTOP=$NSTOP,
@@ -46,7 +46,10 @@ YS_NL%NREQIN=-1,
  LSLAG=true,
  LSLPHY=.false.,
  LSLPHY=.true.,
-/    
+/  
+&NAMCVER
+  LVERTFE=false,
+/  
 &NAMPAR1
   LSPLIT=true,
   NFLDIN=0,
@@ -71,7 +74,7 @@ YS_NL%NREQIN=-1,
 /   
 &NAERAD
  NRPROMA=-24,
- CRTABLEDIR="/home/user/oifs/ifsdata/rtable/", ! modify this for your installation
+ CRTABLEDIR="rtables/", ! modify this for your installation
 /   
 &NAMGEM
   NHTYP=0,
@@ -99,22 +102,18 @@ YS_NL%NREQIN=-1,
 &NAMRES
   NFRRES=9999,
 /   
-&NAMINI
-  NEINI=0,
-/
 &NAMFPC
     CFPFMT='MODEL',
-    NFP3DFS=$NFP3DFS,
-    MFP3DFS(1:)=$MFP3DFS,
-    NRFP3S=$NRFP3S,
-    NFP2DF=$NFP2DF,
-    MFP2DF=$MFP2DF,
-    LFITP=true,
-    NFP3DFP=$NFP3DFP,
-    MFP3DFP=$MFP3DFP,
-    RFP3P(1:)=$RFP3P,
-    NFPPHY=$NFPPHY,
-    MFPPHY(1:)=$MFPPHY,
+    $NFP3DFS
+    $MFP3DFS
+    $NRFP3S
+    $NFP2DF
+    $MFP2DF
+    $NFP3DFP
+    $MFP3DFP
+    $RFP3P
+    $NFPPHY
+    $MFPPHY
 /
 $NAMGRIB
 $NAMSPSDT
@@ -420,5 +419,10 @@ $NAMCUMF
 /
 &NAEPHLI
 /
-
+&NAMPPVI
+/
+&NAMRLX
+/
+&NAMSPNG
+/
 EOF
