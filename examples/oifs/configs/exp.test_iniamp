@@ -69,6 +69,9 @@ BATCHQUEUE=test
 # Additional make-tasks
 export EXTRA_TASKS=1
 
+# CPUs for separate initial file generation
+export PREP_CPUS=6
+
 export NNODES CPUSTOT CPUSPERMODEL TIMEFORMODEL EXPTIME BATCHQUEUE
 
 
@@ -78,7 +81,7 @@ export NNODES CPUSTOT CPUSPERMODEL TIMEFORMODEL EXPTIME BATCHQUEUE
 # --------------------------------------------------------------
 # Model structure and programs that are needed
 REQUIRE_DIRS="WORK SCRI DATA SRC BIN"
-REQUIRE_ITEMS="main.bash link.bash run.bash mandtg util_tools.bash define_makefile ppro.bash ppro_ens.bash"
+REQUIRE_ITEMS="main.bash link.bash run.bash mandtg util_tools.bash define_makefile define_makefile_2 ppro.bash ppro_ens.bash"
 REQUIRE_NAMEL="namelist_general.bash namelist_${OIFSv}.bash"
 
 
@@ -104,9 +107,9 @@ LSPPT_AMPLITUDE=1.2
 LSKEB="false" # "true" does not work with cy38r1
 
 # Initial state perturbations
-export INIPERT=0
-export INIPERT_AMPLITUDE=1.0
-export INIPERT_TYPE='eda' # both, sv, eda
+export INIPERT=1
+export INIPERT_AMPLITUDE=1.1
+export INIPERT_TYPE='both' # both, sv, eda
 
 
 # --------------------------------------------------------------

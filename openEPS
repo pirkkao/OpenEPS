@@ -38,6 +38,10 @@ case $arg in
 	VERBOSE=0
 	shift # past empty argument
 	;;
+    -dr|--dry-run)
+	DRYRUN="true"
+	shift # past empty argument
+	;;
     -h|--help)
 	head '-n 21' README
 	exit
@@ -69,18 +73,22 @@ printf '\n%s\n\n' "Start date for ensemble is $SDATE and end date $EDATE"
 #
 source bin/util_init.bash
 
-# Launch bash/batch job
-#
+if [ -z $DRYRUN ]; then
+    # Launch bash/batch job
+    #
 
-cd $WORK
-printf "\n3) Submitting job...\n"
+    cd $WORK
+    printf "\n3) Submitting job...\n"
 
-if [ ! -z $SEND_AS_SINGLEJOB ]; then
-    sbatch main.bash
+    if [ ! -z $SEND_AS_SINGLEJOB ]; then
+	sbatch main.bash
+    else
+	bash main.bash &
+    fi
+
+    printf "   ...done! Launcher closing...\n\n"
 else
-    bash main.bash &
+    printf "\n3) submit job from $WORK with sbatch main.bash\n\n"
 fi
-
-printf "   ...done! Launcher closing...\n\n"
 
 exit 1

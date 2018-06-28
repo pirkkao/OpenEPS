@@ -155,6 +155,20 @@ while [ $cdate -le $EDATE ]; do
     # Generate makefile for current date
     if [ $MODEL != lorenz95 ]; then
 	. $SCRI/define_makefile  > $DATA/${DATE_DIR}$cdate/makefile_$cdate
+
+	if [ -e $SCRI/define_makefile_2 ]; then
+	    . $SCRI/define_makefile_2 > $DATA/${DATE_DIR}$cdate/makefile_2_$cdate
+
+	    # Also, copy main.bash and make a version to run makefile_2
+	    cp $WORK/main.bash $WORK/ini.bash
+
+	    # Redo resource allocation
+	    if [ -z $PREP_CPUS ]; then
+		PREP_CPUS=4
+	    fi
+	    sed -i "/#SBATCH -n/c\#SBATCH -n $PREP_CPUS" $WORK/ini.bash
+	    sed -i "/make    -f/c\            make -f makefile_2_\$cdate -j $PREP_CPUS" $WORK/ini.bash
+	fi
     fi
     
     cdate=$ndate

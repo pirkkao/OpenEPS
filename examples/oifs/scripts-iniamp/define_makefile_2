@@ -25,56 +25,23 @@ source $WORK/util_tools.bash
 
 pert_struct=$SUBDIR_NAME
 
-if [ ! -z $LPAR ] && [ $LPAR == "true" ]; then
-    target_5="parfile"
-    prereq_5="infile"
-    recipe_5=(
-	"cd \$(dir \$@) ; \
-         $serial ${SCRI}/par_set.bash"
-    )
-    recipe_1="$serial ${SCRI}/par_gen.bash $cdate ; "
-    applyto_5=individual
-else
-    recipe_1=""
-fi
 
-target_4="infile"
-prereq_4=""
-recipe_4=(
-    "cd \$(dir \$@) ; \
-     $serial ${SCRI}/link.bash"
-)
-applyto_4=individual
+target_3=""
 
-target_3="outfile"
-prereq_3="infile"
-if [ ! -z $LPAR ] && [ $LPAR == "true" ]; then
-    prereq_3="infile parfile"
-fi
-recipe_3=(
-    "cd \$(dir \$@) ; \
-     $serial ${SCRI}/run.bash ;\
-     $parallel $MODEL_EXE -v ecmwf -e $EXPS ; \
-     $serial ${SCRI}/run.bash finish"
-)
-applyto_3=individual
-
-
-target_2="ppfile"
-prereq_2="outfile"
+target_2="infile"
+prereq_2=""
 recipe_2=(
     "cd \$(dir \$@) ; \
-     $serial ${SCRI}/ppro.bash \"$NPPRO\"  ; \
-     echo > ppfile"
+     $serial ${SCRI}/link.bash ; \
+     echo > infile "
 )
 applyto_2=individual
 
 
 target_1="MAIN/date_finished"
-prereq_1="ppfile"
+prereq_1="infile"
 recipe_1=(
-    "$serial ${SCRI}/ppro_ens.bash \"$NPPRO\" ; $recipe_1 \
-     echo > date_finished"
+    ""
 )
 applyto_1=main_all
 
