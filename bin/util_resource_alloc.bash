@@ -34,18 +34,19 @@ fi
 # Note! Parallels can run in the same node and/or in different
 # nodes, need to check that no inter-node parallelism is allocated
 parallels_in_node=$(echo $SYS_CPUSPERNODE / $CPUSPERMODEL | bc)
-#parallel_nodes=$(echo "$NNODES / $nodespermodel" | bc)
-parallel_nodes=$(echo "$totncpus / $cpus / $parallels_in_node" | bc)
-if [ $parallels_in_node -eq 0 ]; then
-    parallels=$parallel_nodes
-else
-    parallels=$(echo "$parallels_in_node * $parallel_nodes" | bc)
+
+# Safety check if running on non-full nodes
+if [ $CPUSTOT -lt $SYS_CPUSPERNODE ]; then
+    parallels_in_node=$(echo $CPUSTOT / $CPUSPERMODEL | bc)
 fi
 
 # Fix parallels to be at least 1
 if [ $parallels_in_node -eq 0 ]; then
     parallels_in_node=1
 fi
+
+parallel_nodes=$(echo "$totncpus / $cpus / $parallels_in_node" | bc)
+
 
 # (MPI) launcher
 launcher=$(basename $(which aprun 2> /dev/null || which srun 2> /dev/null || which mpirun 2> /dev/null || which bash ))
