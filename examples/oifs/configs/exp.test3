@@ -2,7 +2,7 @@
 #
 # EXPERIMENT SPECIFIC SETTINGS
 #
-# test2 - T159 with CY40R1
+# test3 - T159 with CY40R1 - increase initial perturbation amplitude
 #
 # Example settings for an ensemble run with initial state linking
 # from a local repository. Ensemble generated through initial state
@@ -19,8 +19,8 @@
 # GENERAL
 # --------------------------------------------------------------
 # Basics
-EXPL="EPS_test2_t159"  # Long exp name
-EXPS="eps2"           # 4 letter exp name
+EXPL="EPS_test3_t159_iniamp"  # Long exp name
+EXPS="eps3"      # 4 letter exp name
 SDATE=2017080100  # Exp start date
 EDATE=2017080112  # Exp end   date
 DSTEP=12          # Hours between ensembles
@@ -34,10 +34,10 @@ FCLEN=48
 ENS=6
 
 # Folder for modded scripts (e.g. "parest", when scripts are in /scripts-parest/)
-SCR_MOD=""
+SCR_MOD="iniamp"
 
-# Version
-OIFSv=38r1v04 #40r1v1
+# Version (use default set in env-file if left blank)
+OIFSv=
 
 # Model bin (use default set in env-file if left blank)
 MODEL_EXE=
@@ -55,7 +55,7 @@ NNODES=
 CPUSTOT=48
 
 # CPUs per single model
-CPUSPERMODEL=12
+CPUSPERMODEL=24
 
 # Define OMP level and whether to use DR_HOOK or not
 OMP_NUM_THREADS=1
@@ -66,11 +66,17 @@ DR_HOOK=1
 # see the time estimation formula in env.-configuration file.
 TIMEFORMODEL=
 # or
-EXPTIME="00:20:00"
+EXPTIME="00:30:00"
 
 # Which queue to submit the job to
 # (use default set in env-file if left blank)
 BATCHQUEUE=
+
+# Additional make-tasks
+export EXTRA_TASKS=2
+
+# CPUs for separate initial file generation
+export PREP_CPUS=6
 
 export NNODES CPUSTOT CPUSPERMODEL TIMEFORMODEL EXPTIME BATCHQUEUE
 
@@ -81,8 +87,7 @@ export NNODES CPUSTOT CPUSPERMODEL TIMEFORMODEL EXPTIME BATCHQUEUE
 # --------------------------------------------------------------
 # Model structure and programs that are needed
 REQUIRE_DIRS="WORK SCRI DATA SRC BIN"
-REQUIRE_ITEMS="main.bash link.bash run.bash mandtg util_tools.bash define_makefile ppro.bash ppro_ens.bash"
-REQUIRE_NAMEL="namelist_general.bash namelist_${OIFSv}.bash"
+REQUIRE_ITEMS="main.bash link.bash run.bash mandtg util_tools.bash define_makefile define_makefile_2 ppro.bash ppro_ens.bash"
 
 
 
@@ -90,7 +95,7 @@ REQUIRE_NAMEL="namelist_general.bash namelist_${OIFSv}.bash"
 # TESTING
 # --------------------------------------------------------------
 # Vital executables that must exist
-REQUIRE_PATHS="$REQUIRE_PATHS MODEL_EXE cdo sbatch"
+REQUIRE_PATHS="$REQUIRE_PATHS cdo sbatch"
 
 # Vital variables that must exist
 REQUIRE_VARS="$REQUIRE_VARS EXPL EXPS SDATE EDATE DSTEP RES LEV FCLEN ENS NNODES"
@@ -103,11 +108,13 @@ REQUIRE_VARS="$REQUIRE_VARS EXPL EXPS SDATE EDATE DSTEP RES LEV FCLEN ENS NNODES
 
 # Stochastic physics
 LSPPT="true"
+LSPPT_AMPLITUDE=1.2
 LSKEB="false" # "true" does not work with cy38r1
 
 # Initial state perturbations
 export INIPERT=1
-
+export INIPERT_AMPLITUDE=1.1
+export INIPERT_TYPE='both' # both, sv, eda
 
 
 # --------------------------------------------------------------

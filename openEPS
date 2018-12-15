@@ -8,9 +8,9 @@
 
 # Run options
 #
-NAME=test4_t159_parest
+NAME=test2
 MODEL=oifs
-HOST=taito
+HOST=sisu
 
 # Read in command line args
 #
@@ -30,6 +30,11 @@ case $arg in
 	shift # past arguments
 	shift
 	;;
+    -h|--host)
+	HOST="$2"
+	shift # past arguments
+	shift
+	;;
     -r|--restart)
 	RESTART="true"
 	shift # past empty argument
@@ -42,7 +47,7 @@ case $arg in
 	DRYRUN="true"
 	shift # past empty argument
 	;;
-    -h|--help)
+    --help)
 	head '-n 21' README
 	exit
 	;;

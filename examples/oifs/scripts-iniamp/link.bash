@@ -58,8 +58,8 @@ else
 	
     else
        # get perturbations
-	/homeappl/home/ollinaho/grib-api/bin/grib_set -s edition=1 $gginit gginit
-	/homeappl/home/ollinaho/grib-api/bin/grib_set -s edition=1 $gginit_pert gginit_pert
+	$GRIBTOOLS/grib_set -s edition=1 $gginit gginit
+	$GRIBTOOLS/grib_set -s edition=1 $gginit_pert gginit_pert
 	cdo -sub gginit gginit_pert pert
 
 	# change perturbation magnitude
@@ -67,7 +67,7 @@ else
 
 	# add back to unperturbed fields
 	cdo -add gginit pert_dot pert_fin
-	/homeappl/home/ollinaho/grib-api/bin/grib_set -s edition=2 -s gridType=reduced_gg pert_fin ICMGG${EXPS}INIT
+	$GRIBTOOLS/grib_set -s edition=2 -s gridType=reduced_gg pert_fin ICMGG${EXPS}INIT
 	rm -f pert pert_dot gginit gginit_pert pert_fin
     fi
 
@@ -79,8 +79,8 @@ else
 
     else
        # get perturbations
-	/homeappl/home/ollinaho/grib-api/bin/grib_set -s edition=1 $gginiua gginiua
-	/homeappl/home/ollinaho/grib-api/bin/grib_set -s edition=1 $gginiua_pert gginiua_pert
+	$GRIBTOOLS/grib_set -s edition=1 $gginiua gginiua
+	$GRIBTOOLS/grib_set -s edition=1 $gginiua_pert gginiua_pert
 	cdo -sub gginiua gginiua_pert pert
 
         # change perturbation magnitude
@@ -88,7 +88,7 @@ else
 
         # add back to unperturbed fields
 	cdo -add gginiua pert_dot pert_fin
-	/homeappl/home/ollinaho/grib-api/bin/grib_set -s edition=2 -s gridType=reduced_gg pert_fin ICMGG${EXPS}INIUA
+	$GRIBTOOLS/grib_set -s edition=2 -s gridType=reduced_gg pert_fin ICMGG${EXPS}INIUA
 	rm -f pert pert_dot gginiua gginiua_pert pert_fin
     fi
 

@@ -2,11 +2,11 @@
 #
 # EXPERIMENT SPECIFIC SETTINGS
 #
-# test1 - T21 with CY38R1
+# test2 - T159 with system default OIFS version
 #
 # Example settings for an ensemble run with initial state linking
 # from a local repository. Ensemble generated through initial state
-# perturbations and SPPT model uncertainty representation.  
+# perturbations only.  
 #
 # After each model integration a simple cdo collection
 # task of a few meteorological fields is executed (hence the need for
@@ -19,25 +19,25 @@
 # GENERAL
 # --------------------------------------------------------------
 # Basics
-EXPL="EPS_test1_t21"  # Long exp name
-EXPS="eps1"          # 4 letter exp name
+EXPL="EPS_test2_t159"  # Long exp name
+EXPS="eps2"           # 4 letter exp name
 SDATE=2017080100  # Exp start date
-EDATE=2017080100  # Exp end   date
+EDATE=2017080112  # Exp end   date
 DSTEP=12          # Hours between ensembles
 
 # Resolution, vertical levels, model run length (in steps[/hours/days])
-RES=21
-LEV=19
+RES=159
+LEV=91
 FCLEN=48
 
 # Ensemble size (CTRL is always member 0, so real size is ENS+1)
 ENS=6
 
-# Folder for modded scripts (e.g. "-parest", when scripts are in /scripts-parest/)
+# Folder for modded scripts (e.g. "parest", when scripts are in /scripts-parest/)
 SCR_MOD=""
 
-# Version
-OIFSv=38r1v04
+# Version (use default set in env-file if left blank)
+OIFSv=
 
 # Model bin (use default set in env-file if left blank)
 MODEL_EXE=
@@ -52,10 +52,10 @@ export EXPL EXPS SDATE EDATE DSTEP RES LEV FCLEN ENS
 # Number of nodes or number of cores per model
 NNODES=
 # or
-CPUSTOT=4
+CPUSTOT=48
 
 # CPUs per single model
-CPUSPERMODEL=2
+CPUSPERMODEL=24
 
 # Define OMP level and whether to use DR_HOOK or not
 OMP_NUM_THREADS=1
@@ -66,7 +66,7 @@ DR_HOOK=1
 # see the time estimation formula in env.-configuration file.
 TIMEFORMODEL=
 # or
-EXPTIME="00:15:00"
+EXPTIME="00:30:00"
 
 # Which queue to submit the job to
 # (use default set in env-file if left blank)
@@ -82,7 +82,6 @@ export NNODES CPUSTOT CPUSPERMODEL TIMEFORMODEL EXPTIME BATCHQUEUE
 # Model structure and programs that are needed
 REQUIRE_DIRS="WORK SCRI DATA SRC BIN"
 REQUIRE_ITEMS="main.bash link.bash run.bash mandtg util_tools.bash define_makefile ppro.bash ppro_ens.bash"
-REQUIRE_NAMEL="namelist_general.bash namelist_${OIFSv}.bash"
 
 
 
@@ -90,7 +89,7 @@ REQUIRE_NAMEL="namelist_general.bash namelist_${OIFSv}.bash"
 # TESTING
 # --------------------------------------------------------------
 # Vital executables that must exist
-REQUIRE_PATHS="$REQUIRE_PATHS MODEL_EXE cdo sbatch"
+REQUIRE_PATHS="$REQUIRE_PATHS cdo sbatch"
 
 # Vital variables that must exist
 REQUIRE_VARS="$REQUIRE_VARS EXPL EXPS SDATE EDATE DSTEP RES LEV FCLEN ENS NNODES"
@@ -102,7 +101,7 @@ REQUIRE_VARS="$REQUIRE_VARS EXPL EXPS SDATE EDATE DSTEP RES LEV FCLEN ENS NNODES
 # --------------------------------------------------------------
 
 # Stochastic physics
-LSPPT="true"
+LSPPT="false"
 LSKEB="false" # "true" does not work with cy38r1
 
 # Initial state perturbations
