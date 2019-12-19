@@ -158,22 +158,39 @@ while [ $cdate -le $EDATE ]; do
 
 	if [ -e $SCRI/define_makefile_2 ]; then
 	    . $SCRI/define_makefile_2 > $DATA/${DATE_DIR}$cdate/makefile_2_$cdate
-
-	    # Also, copy main.bash and make a version to run makefile_2
-	    cp $WORK/main.bash $WORK/ini.bash
-
-	    # Redo resource allocation
-	    if [ -z $PREP_CPUS ]; then
-		PREP_CPUS=4
-	    fi
-	    sed -i "/#SBATCH -n/c\#SBATCH -n $PREP_CPUS" $WORK/ini.bash
-	    sed -i "/make    -f/c\            make -f makefile_2_\$cdate -j $PREP_CPUS" $WORK/ini.bash
 	fi
     fi
     
     cdate=$ndate
 done
 
+# In case of separate initial file generation (i.e. if 
+# makefile_2 exists), copy main.bash as ini.bash and 
+# modify to allow submitting from taito
+#
+if [ -e $SCRI/define_makefile_2 ]; then
+
+    cp $WORK/main.bash $WORK/ini.bash
+
+    # Redo resource allocation
+    if [ -z $PREP_CPUS ]; then
+	PREP_CPUS=4
+    fi
+    sed -i "/#SBATCH -n/c\#SBATCH -n $PREP_CPUS" $WORK/ini.bash
+    sed -i "/#SBATCH -N/c\#SBATCH -n $PREP_CPUS" $WORK/ini.bash
+    sed -i "/make    -f/c\            make -f makefile_2_\$cdate -j $PREP_CPUS" $WORK/ini.bash
+
+    # Allow submitting ini.bash to taito even if main is to be run in sisu
+    if [ ! -e $SRC/env.taito ]; then
+	cp -f examples/$MODEL/configs/env.taito $SRC/.
+	sed -i "s/\_taito\b/_sisu/g" $SRC/env.taito
+
+	sed -i "s|env.\*|env.taito|g" $WORK/ini.bash
+	sed -i "s|env.\*|env.sisu|g"  $WORK/main.bash
+    fi
+fi
+
+# Different set of rules for lorenz
 if [ $MODEL == lorenz95 ]; then
     pushd $DATA > /dev/null
     cp ${DEFDIR}/eppes_init/*.dat eppes/day0

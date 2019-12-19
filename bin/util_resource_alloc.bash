@@ -50,6 +50,8 @@ parallel_nodes=$(echo "$totncpus / $cpus / $parallels_in_node" | bc)
 
 # (MPI) launcher
 launcher=$(basename $(which aprun 2> /dev/null || which srun 2> /dev/null || which mpirun 2> /dev/null || which bash ))
+# Hard-code this, srun is failing on sisu
+launcher=aprun
 case "$launcher" in
     aprun|srun)
 	parallel="$launcher -n $CPUSPERMODEL"

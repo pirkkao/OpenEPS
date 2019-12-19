@@ -1,0 +1,73 @@
+#!/bin/bash
+#
+# Targets and rules for makefile
+#
+# target_1   - the final target that make will try to reach
+# prereq_1   - prerequirements of TARGET_1
+# recipe_1     - commands to execute once NEEDED_1 are available
+#
+# target_2   - what TARGET_2 aims to provide
+# prereq_2   - prerequirements of TARGET_2
+# recipe_2     - commands to execute once NEEDED_2 are available
+#
+# target_3   - what TARGET_3 aims to provide
+# prereq_3   - prerequirements of TARGET_3
+# recipe_3     - commands to execute once NEEDED_3 are available
+#
+# etc.
+#
+# Keywords:
+# MAIN - points to root of current date dir (e.g. MAIN/finished --> day1/finished)
+# DIR  - indicates position of perturbation folder
+#        (e.g. ../$ndate/DIR/infile --> ../day2/pert000/infile)
+
+source $WORK/util_tools.bash
+
+pert_struct=$SUBDIR_NAME
+
+if [ ! -z $LPAR ] && [ $LPAR == "true" ]; then
+    target_4="parfile"
+    prereq_4="infile"
+    recipe_4=(
+	"cd \$(dir \$@) ; \
+         $serial ${SCRI}/par_set.bash"
+    )
+    recipe_1=""
+    applyto_4=individual
+else
+    recipe_1=""
+fi
+
+target_3="infile"
+prereq_3=""
+recipe_3=(
+    "cd \$(dir \$@) ; \
+     $serial ${SCRI}/link.bash"
+)
+applyto_3=individual
+
+target_2="outfile"
+prereq_2="infile"
+if [ ! -z $LPAR ] && [ $LPAR == "true" ]; then
+    prereq_2="infile parfile"
+fi
+recipe_2=(
+    "cd \$(dir \$@) ; \
+     $serial ${SCRI}/run.bash ;\
+     $parallel $MODEL_EXE -v ecmwf -e $EXPS ; \
+     $serial ${SCRI}/run.bash finish"
+)
+applyto_2=individual
+
+
+target_1="MAIN/date_finished"
+prereq_1="outfile"
+recipe_1=(
+    "echo > date_finished"
+)
+applyto_1=main_all
+
+
+# Loop through all targets
+write_makefile
+
