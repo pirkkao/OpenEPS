@@ -9,12 +9,11 @@ usage : ./openEPS [Options]
                  clean run
    -s, --silent  Do not print stderr and stdout on konsole
    -h, --help    This help
-   --kill        [Kill already running exp]
 
 
 This is a versatile Ensemble Prediction System that provides the
 framework for running ensembles of different applications. So
-far scripts are available for running OpenIFS and a very simple
+far the scripts are available for running OpenIFS and a very simple
 testcase. There is still quite much to do, and the structure will
 likely be changed until everything is clean and understandable.
 So, please be patient when using!
@@ -38,16 +37,16 @@ guidance on how to setup and utilize openEPS for running
    (examples/$MODEL/configs/exp.$NAME)
    (examples/$MODEL/configs/env.$HOST)
 
-2) Test all needed files etc. are present
+2) [Test all needed files etc. are present]
    (bin/util_test.bash)
 
 3) Initialize experiment
-    - Create experiment structure (create paths, copy scripts)
-    - Calculate resource allocation, i.e. how much can be run
-      parallel
-    - Adjust model namelist(s) accordingly
-    - Create explicit makefiles for all dates
-    - Initialize parameter estimation
+   - Create experiment structure (create paths, copy scripts)
+   - Calculate resource allocation, i.e. how much can be run
+     in parallel
+   - Adjust model namelist(s) accordingly
+   - Create explicit makefiles for all dates
+   - IF parameter estimation: Initialize parameter estimation
    - Modify patch job resource requirements
    - Adjust post processing scripts  
    (bin/util_init.bash)  
@@ -69,7 +68,7 @@ exp.test
    namelists
 2) once initial states are available, run the model
 3) once model output is available, do some simple post-processing
-4) once all ensemble members have completed 1-3 run a common
+4) once all ensemble members have completed 1-3, run a common
    post-processing script
 5) go to next date
 
@@ -87,12 +86,13 @@ exp.test3
 
 
  --------------------------------------------------------------
-  ISSUES/TBD (30th January 2018):
+  ISSUES/TBD (21st April 2020):
  --------------------------------------------------------------
  
-
+Need to migrate base repository to the new CSC supercomputer.
+OIFS CY43R3 namelist implementations not done yet.
 
 
 Pirkka Ollinaho, pirkka.ollinaho@fmi.fi
-30th January 2018
+21st April 2020
 
