@@ -2,25 +2,35 @@
 #
 # EXPERIMENT SPECIFIC SETTINGS
 #
-# test3 - T159 with CY40R1 - increase initial perturbation amplitude
+# Example 4 - T159 with system default OIFS version 
+# Algorithmic parameter estimation and running ensembles with
+# varying closure parameter values.
 #
-# Example settings for an ensemble run with initial state linking
-# from a local repository. Ensemble generated through initial state
-# perturbations and SPPT model uncertainty representation.  
+# Example settings for an experiment with varying closure parameter
+# values. Ensemble spread is generated varying global closure parameter 
+# values.  
 #
-# After each model integration a simple cdo collection
+# After each model integration, a simple cdo collection
 # task of a few meteorological fields is executed (hence the need for
 # cdo to run this example). After all ensemble members have finished
 # another cdo task is executed to calculate the mean and stdev of
 # the ensemble.
 #
+# The post-processed fields could be used to calculate a cost function
+# for the tested-out parameter values, instead here just a random value
+# is given to each parameter performance evaluation as an example. These 
+# values are then used to update and draw new parameter values for the
+# next ensemble run date.
+#
+# For quick visualization of the ensemble run, run ./plot.bash 
+# after OpenEPS has finished.
 
 # --------------------------------------------------------------
 # GENERAL
 # --------------------------------------------------------------
 # Basics
-EXPL="EPS_test3_t159_iniamp"  # Long exp name
-EXPS="eps3"      # 4 letter exp name
+EXPL="EPS_example4_t159_parest"  # Long exp name
+EXPS="eps4"       # 4 letter exp name
 SDATE=2017080100  # Exp start date
 EDATE=2017080112  # Exp end   date
 DSTEP=12          # Hours between ensembles
@@ -31,13 +41,13 @@ LEV=91
 FCLEN=48
 
 # Ensemble size (CTRL is always member 0, so real size is ENS+1)
-ENS=6
+ENS=2
 
 # Folder for modded scripts (e.g. "parest", when scripts are in /scripts-parest/)
-SCR_MOD="iniamp"
+SCR_MOD="parest"
 
 # Version (use default set in env-file if left blank)
-OIFSv=
+OIFSv= #40r1v1
 
 # Model bin (use default set in env-file if left blank)
 MODEL_EXE=
@@ -52,10 +62,10 @@ export EXPL EXPS SDATE EDATE DSTEP RES LEV FCLEN ENS
 # Number of nodes or number of cores per model
 NNODES=
 # or
-CPUSTOT=48
+CPUSTOT=60
 
 # CPUs per single model
-CPUSPERMODEL=24
+CPUSPERMODEL=20
 
 # Define OMP level and whether to use DR_HOOK or not
 OMP_NUM_THREADS=1
@@ -72,12 +82,6 @@ EXPTIME="00:30:00"
 # (use default set in env-file if left blank)
 BATCHQUEUE=
 
-# Additional make-tasks
-export EXTRA_TASKS=2
-
-# CPUs for separate initial file generation
-export PREP_CPUS=6
-
 export NNODES CPUSTOT CPUSPERMODEL TIMEFORMODEL EXPTIME BATCHQUEUE
 
 
@@ -87,7 +91,7 @@ export NNODES CPUSTOT CPUSPERMODEL TIMEFORMODEL EXPTIME BATCHQUEUE
 # --------------------------------------------------------------
 # Model structure and programs that are needed
 REQUIRE_DIRS="WORK SCRI DATA SRC BIN"
-REQUIRE_ITEMS="main.bash link.bash run.bash mandtg util_tools.bash define_makefile define_makefile_2 ppro.bash ppro_ens.bash"
+REQUIRE_ITEMS="main.bash link.bash run.bash mandtg util_tools.bash define_makefile ppro.bash ppro_ens.bash  par_init.bash par_gen.bash par_set.bash plot.bash plot_main.py plot_modules.py"
 
 
 
@@ -107,14 +111,8 @@ REQUIRE_VARS="$REQUIRE_VARS EXPL EXPS SDATE EDATE DSTEP RES LEV FCLEN ENS NNODES
 # --------------------------------------------------------------
 
 # Stochastic physics
-LSPPT="true"
-LSPPT_AMPLITUDE=1.2
+LSPPT="false"
 LSKEB="false" # "true" does not work with cy38r1
-
-# Initial state perturbations
-export INIPERT=1
-export INIPERT_AMPLITUDE=1.1
-export INIPERT_TYPE='both' # both, sv, eda
 
 
 # --------------------------------------------------------------
@@ -134,14 +132,14 @@ LEVSM=$(echo $(seq 19)) # String list with spaces in between
 LEVSM="-99"
 
 # Pressure level variables and pressure levels (in Pa)
-VARSP="129 130 133"
-LEVSP="50000.0 92500.0"
+VARSP="129 130"
+LEVSP="50000.0 85000.0"
 
 # Surface level dynamic variables
 VARSS="" #129 152"
 
 # Surface variables
-VARPP="151 165 176 177 208"
+VARPP="151 167 228"
 
 
 
@@ -166,8 +164,8 @@ done
 # --------------------------------------------------------------
 
 # EPPES bin
-EPPES_EXE=/homeappl/home/lautuppi/appl_taito/EPPES/eppes_routine
+EPPES_EXE=/projappl/project_2001011/eppes/eppes/eppesroutine.py
 
-LPAR="false"
+LPAR="true"
 
 export EPPES_EXE LPAR

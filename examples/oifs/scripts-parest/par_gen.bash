@@ -31,7 +31,9 @@ fi
 #
 pushd $DATA/eppes > /dev/null
 cp -f sampleout.dat oldsample.dat
-./eppes_routine
+
+module load geoconda
+python3 eppes_routine
 
 # Store values
 for item in mu sig n w; do

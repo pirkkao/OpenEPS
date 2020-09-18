@@ -8,9 +8,10 @@
 
 # Run options
 #
+
 NAME=test2
 MODEL=oifs
-HOST=sisu
+HOST=puhti-fmi
 
 # Read in command line args
 #

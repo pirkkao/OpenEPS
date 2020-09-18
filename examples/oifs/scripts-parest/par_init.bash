@@ -7,16 +7,16 @@
 ln -sf $EPPES_EXE $DATA/eppes/eppes_routine
 
 #mufile
-printf "%s\n" "2.0" > $DATA/eppes/mufile.dat
+printf "%s\n" "2.0 2.0" > $DATA/eppes/mufile.dat
 #printf "%s\n" "2.0" >> $DATA/eppes/mufile.dat
 
 #sigfile
-printf "%s\n" "0.4" > $DATA/eppes/sigfile.dat
-#printf "%s\n" "0 2.0" >> $DATA/eppes/sigfile.dat
+printf "%s\n" "0.4 0" > $DATA/eppes/sigfile.dat
+printf "%s\n" "0 0.4" >> $DATA/eppes/sigfile.dat
 
 #bounds
 printf "%s\n" "0.5 4.0" > $DATA/eppes/bounds.dat
-#printf "%s\n" "1.0 4.0" >> $DATA/eppes/bounds.dat
+printf "%s\n" "0.5 4.0" >> $DATA/eppes/bounds.dat
 
 #nfile
 printf "%s\n" "10" > $DATA/eppes/nfile.dat
@@ -25,6 +25,9 @@ printf "%s\n" "10" > $DATA/eppes/nfile.dat
 #wfile
 printf "%s\n" "1" > $DATA/eppes/wfile.dat
 #printf "%s\n" "0 2" >> $DATA/eppes/wfile.dat
+
+#maxstep
+printf "%s\n" "1" > $DATA/eppes/maxstep.dat
 
 
 # ! THIS IS A LOT SIMPLER TO JUST DO BY HAND,
@@ -127,7 +130,9 @@ EOF
 # run sampleonly
 pushd $DATA/eppes > /dev/null
 cp -f eppesconf_init.nml eppesconf.nml
-./eppes_routine
+
+module load geoconda
+python3 eppes_routine
 
 # change nml to production
 cp -f eppesconf_run.nml eppesconf.nml

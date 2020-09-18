@@ -11,6 +11,7 @@ echo `date +%H:%M:%S` parwrite $SUBDIR_NAME${nid} >> $WORK/master.log
 if [ $nid -gt 0 ]; then
     #read par1 < par_values
     par1=$(sed "${nid}q;d" $DATA/eppes/sampleout.dat)
+    par1=$(echo $par1 | awk '{print($1)}')
     
     echo "Using par1 value $par1" > parfile
 

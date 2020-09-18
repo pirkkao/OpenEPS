@@ -2,24 +2,26 @@
 #
 # EXPERIMENT SPECIFIC SETTINGS
 #
-# test2 - T159 with system default OIFS version
+# Example 2 - T159 with system default OIFS version
 #
 # Example settings for an ensemble run with initial state linking
 # from a local repository. Ensemble generated through initial state
 # perturbations only.  
 #
-# After each model integration a simple cdo collection
+# After each model integration, a simple cdo collection
 # task of a few meteorological fields is executed (hence the need for
 # cdo to run this example). After all ensemble members have finished
 # another cdo task is executed to calculate the mean and stdev of
 # the ensemble.
 #
+# For quick visualization of the ensemble run, run ./plot.bash 
+# after OpenEPS has finished.
 
 # --------------------------------------------------------------
 # GENERAL
 # --------------------------------------------------------------
 # Basics
-EXPL="EPS_test2_t159"  # Long exp name
+EXPL="EPS_example2_t159"  # Long exp name
 EXPS="eps2"           # 4 letter exp name
 SDATE=2017080100  # Exp start date
 EDATE=2017080112  # Exp end   date
@@ -31,13 +33,13 @@ LEV=91
 FCLEN=48
 
 # Ensemble size (CTRL is always member 0, so real size is ENS+1)
-ENS=6
+ENS=2
 
 # Folder for modded scripts (e.g. "parest", when scripts are in /scripts-parest/)
 SCR_MOD=""
 
 # Version (use default set in env-file if left blank)
-OIFSv=
+OIFSv= #40r1v1
 
 # Model bin (use default set in env-file if left blank)
 MODEL_EXE=
@@ -52,10 +54,10 @@ export EXPL EXPS SDATE EDATE DSTEP RES LEV FCLEN ENS
 # Number of nodes or number of cores per model
 NNODES=
 # or
-CPUSTOT=48
+CPUSTOT=60
 
 # CPUs per single model
-CPUSPERMODEL=24
+CPUSPERMODEL=20
 
 # Define OMP level and whether to use DR_HOOK or not
 OMP_NUM_THREADS=1
@@ -81,7 +83,7 @@ export NNODES CPUSTOT CPUSPERMODEL TIMEFORMODEL EXPTIME BATCHQUEUE
 # --------------------------------------------------------------
 # Model structure and programs that are needed
 REQUIRE_DIRS="WORK SCRI DATA SRC BIN"
-REQUIRE_ITEMS="main.bash link.bash run.bash mandtg util_tools.bash define_makefile ppro.bash ppro_ens.bash"
+REQUIRE_ITEMS="main.bash link.bash run.bash mandtg util_tools.bash define_makefile ppro.bash ppro_ens.bash plot.bash plot_main.py plot_modules.py"
 
 
 
@@ -126,14 +128,14 @@ LEVSM=$(echo $(seq 19)) # String list with spaces in between
 LEVSM="-99"
 
 # Pressure level variables and pressure levels (in Pa)
-VARSP="129 130 133"
-LEVSP="50000.0 92500.0"
+VARSP="129 130"
+LEVSP="50000.0 85000.0"
 
 # Surface level dynamic variables
 VARSS="" #129 152"
 
 # Surface variables
-VARPP="151 165 176 177 208"
+VARPP="151 167 228"
 
 
 

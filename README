@@ -8,25 +8,34 @@ usage : ./openEPS [Options]
    -r, --restart Remove existing exp data folder and do a
                  clean run
    -s, --silent  Do not print stderr and stdout on konsole
+   -dr,--dry-run Only create a job, do not submit it directly
+                 into a batchjob queue
    -h, --help    This help
 
 
 This is a versatile Ensemble Prediction System that provides the
-framework for running ensembles of different applications. So
-far the scripts are available for running OpenIFS and a very simple
-testcase. There is still quite much to do, and the structure will
-likely be changed until everything is clean and understandable.
-So, please be patient when using!
+framework for running ensembles of different applications. The 
+scripts are available for running OpenIFS. There is still quite 
+much to do, and the structure will likely be changed until 
+everything is clean and understandable.
+
+So, please be patient when using the software!
 
  --------------------------------------------------------------
   Structure:
  --------------------------------------------------------------
 All common utility scripts and programs can be found in bin/.
 A few example setups are available in examples/. These provide
-guidance on how to setup and utilize openEPS for running
-1) Ensembles of OpenIFS
-2) Ensembles of OpenIFS with a parameter estimation algorithm
-   (EPPES)
+guidance on how to setup and utilize openEPS for running 
+ensembles of
+1) OpenIFS with T21 resolution
+2) OpenIFS with TL159 using a dataset of initial state 
+   perturbations
+3) OpenIFS with TL159 using the same dataset for initial state 
+   perturbations but artificially increased perturbation amplitude 
+   (requires CDO) and a model uncertainty representation
+4) OpenIFS with a parameter estimation algorithm (EPPES) and how 
+   to launch ensemble with varying global closure paramter values
 
  --------------------------------------------------------------
   Workflow: (items in [] are TBD)
@@ -63,7 +72,7 @@ written makefiles, the workflow within each makefile may depend
 on the application. For instance, in the OpenIFS examples the
 makefile run logic is the following:
 
-exp.test
+exp.example2
 1) link initial states for each ens member, final adjustments to
    namelists
 2) once initial states are available, run the model
@@ -72,7 +81,7 @@ exp.test
    post-processing script
 5) go to next date
 
-exp.test3
+exp.example4
 1) link initial states for each ens member, final adjustments to
    namelists
 2) once initial states and namelists are available, change
@@ -86,13 +95,10 @@ exp.test3
 
 
  --------------------------------------------------------------
-  ISSUES/TBD (21st April 2020):
+  ISSUES/TBD (18th of September 2020):
  --------------------------------------------------------------
  
-Need to migrate base repository to the new CSC supercomputer.
-OIFS CY43R3 namelist implementations not done yet.
-
 
 Pirkka Ollinaho, pirkka.ollinaho@fmi.fi
-21st April 2020
+18th of September 2020
 

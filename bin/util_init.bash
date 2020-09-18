@@ -181,13 +181,17 @@ if [ -e $SCRI/define_makefile_2 ]; then
     sed -i "/make    -f/c\            make -f makefile_2_\$cdate -j $PREP_CPUS" $WORK/ini.bash
 
     # Allow submitting ini.bash to taito even if main is to be run in sisu
-    if [ ! -e $SRC/env.taito ]; then
-	cp -f examples/$MODEL/configs/env.taito $SRC/.
-	sed -i "s/\_taito\b/_sisu/g" $SRC/env.taito
-
-	sed -i "s|env.\*|env.taito|g" $WORK/ini.bash
-	sed -i "s|env.\*|env.sisu|g"  $WORK/main.bash
-    fi
+    # NOTE! This treatment is only viable if your environment uses shared 
+    # filesystem between two super computers, so that you can execute the
+    # lighter initial file generation on a lighter computer and submit the
+    # the heavier model running on the other.
+    #if [ ! -e $SRC/env.taito ]; then
+	#cp -f examples/$MODEL/configs/env.taito $SRC/.
+	#sed -i "s/\_taito\b/_sisu/g" $SRC/env.taito
+        #
+	#sed -i "s|env.\*|env.taito|g" $WORK/ini.bash
+	#sed -i "s|env.\*|env.sisu|g"  $WORK/main.bash
+    #fi
 fi
 
 # Different set of rules for lorenz

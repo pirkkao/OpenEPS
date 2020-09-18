@@ -53,11 +53,21 @@ else
 fi
 
 # Link climatologies
-ln -sf ${IFSDATA}/climatology/ifsdata .
-ln -sf ${IFSDATA}/rtables
-if [ $RES -eq 21 ]; then
-    ln -sf ${IFSDATA}/38r1/climate/${RES}_full
-else
-    ln -sf ${IFSDATA}/38r1/climate/${RES}l_2
-fi
+if [ $OIFSv != "43r3v1" ]; then
+    ln -sf ${IFSDATA}/rtables rtables
+    ln -sf ${IFSDATA}/vtables vtables
+    ln -sf ${IFSDATA}/climatology/ifsdata .
 
+    if [ $RES -eq 21 ]; then
+	ln -sf ${IFSDATA}/38r1/climate/${RES}_full
+    else
+	ln -sf ${IFSDATA}/38r1/climate/${RES}l_2
+    fi
+
+else
+    ln -sf ${IFSDATA}/43r3/rtables
+    ln -sf ${IFSDATA}/43r3/vtables
+    ln -sf ${IFSDATA}/43r3/ifsdata
+
+    ln -sf ${IFSDATA}/43r3/climate.v015/${RES}l_2
+fi
