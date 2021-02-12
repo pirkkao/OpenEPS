@@ -113,6 +113,7 @@ REQUIRE_VARS="$REQUIRE_VARS EXPL EXPS SDATE EDATE DSTEP RES LEV FCLEN ENS NNODES
 # Stochastic physics
 LSPPT="false"
 LSKEB="false" # "true" does not work with cy38r1
+LSPP="false"  # only cy43r3
 
 
 # --------------------------------------------------------------

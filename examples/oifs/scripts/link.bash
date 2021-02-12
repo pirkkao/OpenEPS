@@ -71,3 +71,32 @@ else
 
     ln -sf ${IFSDATA}/43r3/climate.v015/${RES}l_2
 fi
+
+# Wave model
+if  [ ! -z $WAM ] && [ $WAM -eq 1 ]; then
+
+    # WAM date specific
+    ln -sf ${IFSDATA}/t${RES}/$date/cdwavein .
+    ln -sf ${IFSDATA}/t${RES}/$date/sfcwindin .
+    ln -sf ${IFSDATA}/t${RES}/$date/specwavein .
+    ln -sf ${IFSDATA}/t${RES}/$date/uwavein .
+
+    # WAM general
+    if [ $OIFSv != "43r3v1" ]; then
+	wamver=40r1
+    else
+	wamver=43r3
+    fi
+
+    ln -sf ${IFSDATA}/t${RES}/$wamver/wam_grid_tables .
+    ln -sf ${IFSDATA}/t${RES}/$wamver/wam_subgrid_0 .
+    ln -sf ${IFSDATA}/t${RES}/$wamver/wam_subgrid_1 .
+    ln -sf ${IFSDATA}/t${RES}/$wamver/wam_subgrid_2 .
+
+    # Copy namelist and modify date
+    cp ${IFSDATA}/t${RES}/$wamver/wam_namelist_example_tl$RES wam_namelist
+
+    sed -i -e "s#CBPLTDT  =\"20161201000000\",#CBPLTDT  =\"${date}0000\",#g" wam_namelist
+    sed -i -e "s#CDATEF   =\"20161201000000\",#CDATEF   =\"${date}0000\",#g" wam_namelist
+    sed -i -e "s#CDATECURA=\"20161201000000\",#CDATECURA=\"${date}0000\",#g" wam_namelist
+fi

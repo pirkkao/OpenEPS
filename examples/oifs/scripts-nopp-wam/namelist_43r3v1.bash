@@ -10,8 +10,15 @@ else
 fi
     
 cat <<EOF > $SCRI/namelist.$name
+&NAMARG ! write comments like this
+NCONF=1,
+LSLAG=.true.,
+CNMEXP='$EXPS',
+UTSTEP=$TSTEP,
+CUSTOP='h$NSTOP',      ! txx = timesteps, hxx = hours, dxx = days.
+/
 &NAMDIM
-NPROMA=-24,
+NPROMA=-24, !-8,
 /
 &NAMGFL
 YQ_NL%LGP=true,
@@ -29,27 +36,42 @@ YS_NL%NREQIN=-1,
   MBX_SIZE=128000000,
   NPROC=$NPROC,
   NOUTPUT=1,
-/   
-&NAMCT0
- NFPOS=2,
- LREFOUT=false,
- N3DINI=0,
- NSTOP=$NSTOP,
- NFRDHP=1,
- NFRDHFD=1,
- NFRHIS=$NFRHIS,
- NFRPOS=$NFRPOS,
- NPOSTS=$NPOSTS,
- NHISTS=$NHISTS,
- CTYPE="$CTYPE",
- NFRSDI=1, 
- LSLAG=true,
- LSLPHY=.false.,
- LSLPHY=.true.,
-/  
-&NAMCVER
-  LVERTFE=false,
-/  
+ /    
+ &NAMCT0
+  NFPOS=2,
+  LREFOUT=false, !true,
+  N3DINI=0,
+  NFRDHP=1,
+  NFRDHFD=1,
+  NFRHIS=$NFRHIS,
+  NFRPOS=$NFRPOS,
+  NPOSTS=$NPOSTS,
+  NHISTS=$NHISTS,
+  CTYPE="$CTYPE",
+  NFRSDI=1, 
+  LSLPHY=.false.,
+  LSLPHY=.true.,
+  NUNDEFLD=1,
+ /    
+
+
+!&NAMCT0 ! this alternative also works
+! NFPOS=2,
+! LREFOUT=false,
+! N3DINI=0,
+! NFRDHP=1,
+! NFRDHFD=1,
+! NFRHIS=24,
+! NFRPOS=24,
+! NPOSTS=0,
+! NHISTS=0,
+! CTYPE="cf",
+! NFRSDI=1, 
+! LSLPHY=.false.,
+! LSLPHY=.true.,
+!/  
+
+
 &NAMPAR1
   LSPLIT=true,
   NFLDIN=0,
@@ -59,29 +81,29 @@ YS_NL%NREQIN=-1,
   LPPTSF=false,
   NPPBUFLEN=100000,
 /   
-&NAMRIP
+&NAMRIP0
   NINDAT=19970115,
   NSSSSS=43200,
 /   
-&NAMDYN
- TSTEP=$TSTEP,
-/
 &NAEPHY
  LEPHYS=true,
  LERADI=true,
  LELAIV=false,
- LBUD23=false,
- $WAMCOUPLING
+ LWCOU=true,           ! turns on wave model
+ LWCOU2W=true,     ! enables 2-way coupling between atmosphere & wave model
 /   
 &NAERAD
  NRPROMA=-24,
- CRTABLEDIR="rtables/", ! modify this for your installation
+ CRTABLEDIR="rtables/",    ! modify this for your installation, note trailing /
 /   
 &NAMGEM
   NHTYP=0,
 /   
-&NAMDPHYDS
-/
+&NAMDPHY
+! NVXTR2=0,
+! NVEXTR=0,
+! NCEXTR=0,
+/    
 &NAMDDH
  BDEDDH(1:6,1)=4.0,1.0,0.0,50.0,0.0,49.0,
  NDHKD=120,
@@ -92,11 +114,7 @@ YS_NL%NREQIN=-1,
  LHDGLB=true,
  LHDPRG=true,
  LHDHKS=true,
-/   
-&NAMNMI
- LNMIRQ=false,
- LASSI=false,
-/   
+/  
 &NAMAFN
   TFP_FUA(1)%LLGP=.false.,
 /   
@@ -120,6 +138,8 @@ $NAMGRIB
 $NAMSPSDT
 $NAMSTOPH
 $NAMCUMF
+$NAMSPP
+
 &NAEAER
 /
 &NAEPHY
@@ -352,6 +372,28 @@ $NAMCUMF
 /
 &NAMSPSDT
 /
+&NAMSPP ! NOTE: parameter estimation not available in standard OpenIFS
+!LPAREST=TRUE,
+!LPARPERT_CFM=1.0,
+!LPARPERT_TOFDC=1.0,
+!LPARPERT_HSDT=1.0,
+!LPARPERT_VDEXC_LEN_STABLE_BL=1.0,
+!LPARPERT_ENTRORG=1.0,
+!LPARPERT_ENTSHALP=1.0,
+!LPARPERT_DETRPEN=1.0,
+!LPARPERT_RPRCON=1.0,
+!LPARPERT_RTAU=1.0,
+!LPARPERT_CUDUDV=1.0,
+!LPARPERT_RAMID=1.0,
+!LPARPERT_RCLDIFF=1.0,
+!LPARPERT_RCLCRIT=1.0,
+!LPARPERT_RLCRITSNOW=1.0,
+!LPARPERT_ZDECORR=1.0,
+!LPARPERT_ZSIGQCW=1.0,
+!LPARPERT_ZRADEFF=1.0,
+!LPARPERT_ZHS_VDAERO=1.0,
+!LPARPERT_DELTA_AERO=1.0,
+/
 &NAMSSMI
 /
 &NAMSTA
@@ -361,8 +403,6 @@ $NAMCUMF
 &NAMTCWV
 /
 &NAMTESTVAR
-/
-&NAMTLEVOL
 /
 &NAMTOPH
 /
@@ -420,10 +460,34 @@ $NAMCUMF
 /
 &NAEPHLI
 /
+&NAMCVER
+/
 &NAMPPVI
+/
+&NAMSPNG
 /
 &NAMRLX
 /
-&NAMSPNG
+&NAMTHLIM
+/
+&NAMOOPS
+/
+&NAMINTFLEX
+/
+&NAMIAU
+/
+&NAMDIM_TRAJ
+/
+&NAMVDF
+/
+&NAMGWDIAG
+/
+&NAMTRANS0
+/
+&NAMMETHOX
+/
+&NAM_ATLAS_IFS
+/
+&NAETLDIAG
 /
 EOF

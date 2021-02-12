@@ -163,6 +163,28 @@ else
     /"
 fi    
 
+# Add SPP switches if TRUE
+if [ $LSPP == "true" ] && [ $imem -gt 0 ]; then
+
+    # Change SPP amplitudes
+    if [ ! -z $LSPP_AMP ]; then
+	SDEV="SDEV=$LSPP_AMP,"
+    else
+	SDEV=""
+    fi
+
+    NAMSPP="
+    &NAMSPP
+      LSPP=true,
+      $SDEV
+    /"
+else
+    NAMSPP="
+    &NAMSPP
+      LSPP=false,
+    /"
+fi
+
 # Add parameter value controls if TRUE
 if [ ! -z $LPAR ] && [ $LPAR == "true" ] && [ $imem -gt 0 ]; then
     NAMCUMF="

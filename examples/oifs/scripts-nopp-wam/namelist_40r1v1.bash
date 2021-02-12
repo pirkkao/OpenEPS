@@ -71,7 +71,8 @@ YS_NL%NREQIN=-1,
  LERADI=true,
  LELAIV=false,
  LBUD23=false,
- $WAMCOUPLING
+ LWCOU=true,           ! turns on wave model
+ LWCOU2W=true,     ! enables 2-way coupling between atmosphere & wave model
 /   
 &NAERAD
  NRPROMA=-24,
