@@ -31,31 +31,45 @@ if [ $cpus -gt $totncpus ]; then
     echo "ILLEGAL RESOURCE ALLOCATION!"
     exit
 fi
-# Note! Parallels can run in the same node and/or in different
-# nodes, need to check that no inter-node parallelism is allocated
-parallels_in_node=$(echo $SYS_CPUSPERNODE / $CPUSPERMODEL | bc)
+
+# Note! In some systems parallels can run only in the same node and/or 
+# in different nodes, need to check that no inter-node parallelism is 
+# allocated. The following does not matter in the case of the latter.
+#
+# Disabled for now.
+#
+#parallels_in_node=$(echo $SYS_CPUSPERNODE / $CPUSPERMODEL | bc)
 
 # Safety check if running on non-full nodes
-if [ $CPUSTOT -lt $SYS_CPUSPERNODE ]; then
-    parallels_in_node=$(echo $CPUSTOT / $CPUSPERMODEL | bc)
-fi
+#if [ $CPUSTOT -lt $SYS_CPUSPERNODE ]; then
+#    parallels_in_node=$(echo $CPUSTOT / $CPUSPERMODEL | bc)
+#fi
 
 # Fix parallels to be at least 1
-if [ $parallels_in_node -eq 0 ]; then
-    parallels_in_node=1
-fi
+#if [ $parallels_in_node -eq 0 ]; then
+#    parallels_in_node=1
+#fi
+
+parallels_in_node=1
 
 parallel_nodes=$(echo "$totncpus / $cpus / $parallels_in_node" | bc)
 
+#
+# Define (MPI) launcher
+# Skip if $launcher defined in env.*
+#
 
-# (MPI) launcher
-launcher=$(basename $(which aprun 2> /dev/null || which srun 2> /dev/null || which mpirun 2> /dev/null || which bash ))
-# Hard-code this, srun is failing on sisu
-#launcher=aprun
+if [ -n "$launcher" ]; then
 
-case "$launcher" in
+  parallel=$launcher
+  serial="bash"
+
+else
+  launcher=$(basename $(which aprun 2> /dev/null || which srun 2> /dev/null || which mpirun 2> /dev/null || which bash ))
+
+  case "$launcher" in
     aprun|srun)
-	parallel="$launcher --exclusive -n $CPUSPERMODEL"
+	parallel="$launcher -n $CPUSPERMODEL"
 	serial="bash"
 	    ;;
     mpirun)
@@ -66,7 +80,9 @@ case "$launcher" in
 	printf "%s" "PARALLEL JOB LAUNCHER $parallel NOT CODED IN, ADD IT TO util_resource_alloc"
 	exit
 	;;
-esac
+  esac
+fi
+
 
 # Write a source file
 cat <<EOF > $SRC/resources

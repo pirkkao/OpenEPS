@@ -1,0 +1,174 @@
+#!/bin/bash
+#
+# EXPERIMENT SPECIFIC SETTINGS
+#
+# Example 5 - T159 with system default OIFS version, ecWAM activated
+#
+# Example settings for an ensemble run with initial state linking
+# from a local repository. Ensemble generated through initial state
+# perturbations only.  
+#
+# After each model integration, a simple cdo collection
+# task of a few meteorological fields is executed (hence the need for
+# cdo to run this example). After all ensemble members have finished
+# another cdo task is executed to calculate the mean and stdev of
+# the ensemble.
+#
+# For quick visualization of the ensemble run, run ./plot.bash 
+# after OpenEPS has finished.
+
+# --------------------------------------------------------------
+# GENERAL
+# --------------------------------------------------------------
+# Basics
+EXPL="EPS_example5_t159"  # Long exp name
+EXPS="eps2"           # 4 letter exp name
+SDATE=2017080100  # Exp start date
+EDATE=2017080112  # Exp end   date
+DSTEP=12          # Hours between ensembles
+
+# Resolution, vertical levels, model run length (in steps[/hours/days])
+RES=159
+LEV=91
+FCLEN=48
+
+# Ensemble size (CTRL is always member 0, so real size is ENS+1)
+ENS=2
+
+# Folder for modded scripts (e.g. "parest", when scripts are in /scripts-parest/)
+SCR_MOD=""
+
+# Version (use default set in env-file if left blank)
+OIFSv= #40r1v1
+
+# Model bin (use default set in env-file if left blank)
+MODEL_EXE=
+
+export EXPL EXPS SDATE EDATE DSTEP RES LEV FCLEN ENS
+
+
+
+# --------------------------------------------------------------
+# RESOURCES
+# --------------------------------------------------------------
+# Number of nodes or number of cores per model
+NNODES=
+# or
+CPUSTOT=60
+
+# CPUs per single model
+CPUSPERMODEL=20
+
+# Define OMP level and whether to use DR_HOOK or not
+OMP_NUM_THREADS=1
+DR_HOOK=1
+
+# Time allocation, either specify run time of a single model instance [min]
+# or estimate bulk time (HH:MM:SS). NOTE: use TIMEFORMODEL with caution,
+# see the time estimation formula in env.-configuration file.
+TIMEFORMODEL=
+# or
+EXPTIME="00:30:00"
+
+# Which queue to submit the job to
+# (use default set in env-file if left blank)
+BATCHQUEUE=
+
+export NNODES CPUSTOT CPUSPERMODEL TIMEFORMODEL EXPTIME BATCHQUEUE
+
+
+
+# --------------------------------------------------------------
+# REQUIRED DIRS AND SCRIPTS
+# --------------------------------------------------------------
+# Model structure and programs that are needed
+REQUIRE_DIRS="WORK SCRI DATA SRC BIN"
+REQUIRE_ITEMS="main.bash link.bash run.bash mandtg util_tools.bash define_makefile ppro.bash ppro_ens.bash plot.bash plot_main.py plot_modules.py"
+
+
+
+# --------------------------------------------------------------
+# TESTING
+# --------------------------------------------------------------
+# Vital executables that must exist
+REQUIRE_PATHS="$REQUIRE_PATHS cdo sbatch"
+
+# Vital variables that must exist
+REQUIRE_VARS="$REQUIRE_VARS EXPL EXPS SDATE EDATE DSTEP RES LEV FCLEN ENS NNODES"
+
+
+
+# --------------------------------------------------------------
+# MODEL RUN OPTIONS
+# --------------------------------------------------------------
+
+# Stochastic physics
+LSPPT="false"
+LSKEB="false" # "true" does not work with cy38r1
+LSPP="false"  # only cy43r3
+
+# Initial state perturbations
+export INIPERT=1
+
+# Use only even numbered initial state pertubations (1), or use all (0)
+# NOTE! Only applicable for ensemble sizes < 26
+export INIFAIR=1
+
+# Enable wave model
+export WAM=1
+
+
+# --------------------------------------------------------------
+# MODEL OUTPUT
+# --------------------------------------------------------------
+
+# Output frequency (6=1h, 36=6h, 72=12h)
+NFRPOS=12
+NFRHIS=12
+NPOSTS=0
+NHISTS=0
+
+# Model level variables and model levels
+# (leave VARSX as "" if no output is desired)
+VARSM=""   # String list with spaces in between
+LEVSM=$(echo $(seq 19)) # String list with spaces in between
+LEVSM="-99"
+
+# Pressure level variables and pressure levels (in Pa)
+VARSP="129 130"
+LEVSP="50000.0 85000.0"
+
+# Surface level dynamic variables
+VARSS="" #129 152"
+
+# Surface variables
+VARPP="151 167 228"
+
+
+
+# --------------------------------------------------------------
+# POST-PROCESSING
+# --------------------------------------------------------------
+
+# pp freqency, space separated list of model times step
+# (set here to be the same as model output freq)
+NPPRO=""
+ttime=$NFRPOS
+while [ $ttime -le $FCLEN ]; do
+    NPPRO="$NPPRO $(printf "%04d" $ttime)"
+    ttime=$(( ttime + NFRPOS ))
+done
+# 
+
+
+
+# --------------------------------------------------------------
+# PARAMETER ESTIMATION
+# --------------------------------------------------------------
+
+# EPPES bin
+EPPES_EXE=/homeappl/home/lautuppi/appl_taito/EPPES/eppes_routine
+
+LPAR="false"
+
+export EPPES_EXE LPAR

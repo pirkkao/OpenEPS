@@ -18,8 +18,10 @@ fi
 
 if [ $mode == "start" ] && [ ! -z $SEND_AS_MULTIJOB ]; then
 if [ $SEND_AS_MULTIJOB == "true" ]; then
-    $parallel $CPUS_PER_MODEL -d 1 -e GRIB_SAMPLES_PATH=$GRIB_SAMPLES_PATH \
-    -e OMP_NUM_THREADS=1 $MODEL_EXE -v ecmwf -e ${exp_name} -f t$FCLEN
+    # CY40R1
+    export GRIB_SAMPLES_PATH=$GRIB_SAMPLES_PATH
+
+    $parallel $CPUS_PER_MODEL -d 1 $MODEL_EXE -v ecmwf -e ${exp_name} -f t$FCLEN
 fi
 fi
 
