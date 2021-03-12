@@ -33,12 +33,23 @@ environment configuration etc. Have a look at the existing
 env-files, copy one that resemples your system configuration 
 the most and setup all the necessary information.
 
-2) Try running the example experiments provided, 2 and 5 are
+2) Create a scripts folder for your experiments in examples/oifs/,
+e.g. scripts-seasonal. Any script in this folder will be used
+instead of the default scripts (found in scripts/). Note, use
+identical names to those found in scripts/. As an example: you
+have need to link more files (or files with different storage
+structure) to OpenIFS as is done in the default scripts/link.bash.
+In this case you could simply copy link.bash to scripts-seasonal/.
+and do any modification necessary there. In order to overwrite
+the default files you simply provide SCR_MOD="seasonal" variable
+in the experiment configuration file (see e.g. exp.example2).
+
+3) Try running the example experiments provided, 2 and 5 are
 recommended:
 ./openEPS -e example2
 ./openEPS -e example5
 
-3) Navigate to the experiment folder and debug if you encounter
+4) Navigate to the experiment folder and debug if you encounter
 problems. Most likely problem is that env-file is not setup
 correctly.
 
