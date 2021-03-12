@@ -21,6 +21,28 @@ everything is clean and understandable.
 
 So, please be patient when using the software!
 
+
+ --------------------------------------------------------------
+  Getting started:
+ --------------------------------------------------------------
+1) Setup an environment file if your HPC/linux cluster/etc.
+is not among the env.-files in the repository. The env.-file
+contains hard coded paths to the model bin, necessary libraries
+that the model requires, information about the computing 
+environment configuration etc. Have a look at the existing
+env-files, copy one that resemples your system configuration 
+the most and setup all the necessary information.
+
+2) Try running the example experiments provided, 2 and 5 are
+recommended:
+./openEPS -e example2
+./openEPS -e example5
+
+3) Navigate to the experiment folder and debug if you encounter
+problems. Most likely problem is that env-file is not setup
+correctly.
+
+
  --------------------------------------------------------------
   Structure:
  --------------------------------------------------------------
@@ -36,6 +58,9 @@ ensembles of
    (requires CDO) and a model uncertainty representation
 4) OpenIFS with a parameter estimation algorithm (EPPES) and how 
    to launch ensemble with varying global closure paramter values
+5) OpenIFS with TL159 using a dataset of initial state 
+   perturbations and utilizing wave model in each forecast. 
+
 
  --------------------------------------------------------------
   Workflow: (items in [] are TBD)
@@ -63,6 +88,7 @@ ensembles of
  4) Submit batchjob, or launch a new bash shell
     - Loop over datelist, and let date specific makefiles
       handle workflow within ensemble for each date (see below)
+
 
  --------------------------------------------------------------
   About make:
